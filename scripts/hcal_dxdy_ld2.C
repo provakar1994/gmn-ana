@@ -356,6 +356,9 @@ void hcal_dxdy_ld2( const char *configfilename,
   double xHCAL, yHCAL, EHCAL;
   double EPS, ESH, xSH, ySH, xPS;
 
+  int tdcElemN;
+  double tdcTrig[MAXNTRACKS], tdcElem[MAXNTRACKS];
+
   //Ignore hodo variables for meow:
   // int maxHODOclusters=100;
   // double nHODOclusters; 
@@ -396,6 +399,11 @@ void hcal_dxdy_ld2( const char *configfilename,
   C->SetBranchStatus("bb.sh.x",1);
   C->SetBranchStatus("bb.sh.y",1);
 
+  //trigger TDC variables
+  C->SetBranchStatus("Ndata.bb.tdctrig.tdcelemID",1);
+  C->SetBranchStatus("bb.tdctrig.tdcelemID",1);
+  C->SetBranchStatus("bb.tdctrig.tdc",1);
+
   C->SetBranchAddress("bb.tr.n",&ntrack);
   C->SetBranchAddress("bb.tr.p",p);
   C->SetBranchAddress("bb.tr.px",px);
@@ -427,15 +435,22 @@ void hcal_dxdy_ld2( const char *configfilename,
   C->SetBranchAddress("bb.sh.x",&xSH);
   C->SetBranchAddress("bb.sh.y",&ySH);
 
+  C->SetBranchAddress("Ndata.bb.tdctrig.tdcelemID",&tdcElemN);
+  C->SetBranchAddress("bb.tdctrig.tdcelemID",&tdcElem);
+  C->SetBranchAddress("bb.tdctrig.tdc",tdcTrig);  
+
   double pcentral = ebeam/(1.+ebeam/Mp*(1.-cos(bbtheta)));
 
   TFile *fout = new TFile(outputfilename,"RECREATE");
 
-  TH1D *h_W_nocut = new TH1D("h_W_nocut",";W (GeV);",250,0,2);
+  //defining all the interesting histograms
+  TH1D *h_coin_time = new TH1D("h_coin_time",";HCAL trigTime - BBCAL trigTime (ns);",150,450,600);
+  
+  TH1D *h_W = new TH1D("h_W",";W (GeV);",250,0,2);
   TH1D *h_W_n_cut = new TH1D("h_W_n_cut",";W (GeV);",250,0,2);
   TH1D *h_W_p_cut = new TH1D("h_W_p_cut",";W (GeV);",250,0,2);
 
-  TH1D *h_dpel_nocut = new TH1D("h_dpel",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
+  TH1D *h_dpel = new TH1D("h_dpel",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
   TH1D *h_dpel_n_cut = new TH1D("h_dpel_n_cut",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
   TH1D *h_dpel_p_cut = new TH1D("h_dpel_p_cut",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
 
@@ -443,6 +458,15 @@ void hcal_dxdy_ld2( const char *configfilename,
   TH1D *h_dyHCAL = new TH1D("h_dyHCAL","; yHCAL - yBB (m);", 250, -1.25,1.25);
 
   TH1D *h_dxHCAL_cut = new TH1D("h_dxHCAL_cut","; xHCAL - xBB (m);", 250, -2.5,2.5);
+
+  TH1D *h_dxHCAL_cut_1 = new TH1D("h_dxHCAL_cut_1","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  TH1D *h_dxHCAL_cut_2 = new TH1D("h_dxHCAL_cut_2","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  TH1D *h_dxHCAL_cut_3 = new TH1D("h_dxHCAL_cut_3","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  TH1D *h_dxHCAL_cut_4 = new TH1D("h_dxHCAL_cut_4","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  TH1D *h_dxHCAL_cut_5 = new TH1D("h_dxHCAL_cut_5","; xHCAL - xBB (m);", 250, -2.5,2.5);
+
+  TH2D *h_W_vs_dxHCAL = new TH2D("h_W_vs_dxHCAL","; xHCAL - xBB (m); W (GeV)", 250,-2.5,2.5,250,0,2);
+  
   TH1D *h_dyHCAL_cut = new TH1D("h_dyHCAL_cut","; yHCAL - yBB (m);", 250, -1.25,1.25);
 
   TH2D *h2_dxdyHCAL = new TH2D("h2_dxdyHCAL","; yHCAL - yBB (m); xHCAL - xBB (m)",
@@ -576,6 +600,17 @@ void hcal_dxdy_ld2( const char *configfilename,
       double thetabend = acos( enhat_fp_rot.Dot( enhat_tgt ) );
       T_thetabend = thetabend;
       // *----
+
+      //coincidence time analysis
+      double bbcal_time=0., hcal_time=0.;
+      for(int ihit=0; ihit<tdcElemN; ihit++){
+	if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
+	if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
+      }
+      double coin_time = hcal_time-bbcal_time;
+      h_coin_time->Fill( coin_time );
+
+      if( fabs(coin_time-510.)>10. ) continue;
       
       //The first thing we want to do is to calculate the "true" electron momentum incident on BigBite:
       double Ebeam_corrected = ebeam - MeanEloss;
@@ -600,12 +635,15 @@ void hcal_dxdy_ld2( const char *configfilename,
       
       double Q2recon = 2.0*Ebeam_corrected*precon*(1.0-cos(etheta));
       double W2recon = pow(Mp,2) + 2.0*Mp*nu_recon - Q2recon;
-      double Wrecon = sqrt( std::max(0.0,W2recon) );
+      double Wrecon;
+      if(W2recon>0) Wrecon = sqrt(W2recon); //sqrt( std::max(0.0,W2recon) );
       T_Q2 = Q2recon;
       T_W2 = W2recon;
+      h_W->Fill( Wrecon );
       
       double dpel = precon/pelastic-1.0;
       T_dpel = dpel;
+      h_dpel->Fill( dpel );
  
       TVector3 vertex( 0, 0, vz[0] );
       TLorentzVector Pbeam(0,0,Ebeam_corrected,Ebeam_corrected);
@@ -650,10 +688,28 @@ void hcal_dxdy_ld2( const char *configfilename,
       h_dyHCAL->Fill( yHCAL - yexpect_HCAL );
       h2_dxdyHCAL->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
 
+      h_W_vs_dxHCAL->Fill( xHCAL - xexpect_HCAL, Wrecon );
+
       if( Wrecon >= Wmin_fit && Wrecon <= Wmax_fit ){
 	h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
 	h_dyHCAL_cut->Fill( yHCAL - yexpect_HCAL );
 	h2_dxdyHCAL_cut->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
+      }
+
+      if( Wrecon >= 0.85 && Wrecon <= 0.9 ){
+	h_dxHCAL_cut_1->Fill( xHCAL - xexpect_HCAL );
+      }
+      if( Wrecon >= 0.9 && Wrecon <= 0.95 ){
+	h_dxHCAL_cut_2->Fill( xHCAL - xexpect_HCAL );
+      }
+      if( Wrecon >= 0.95 && Wrecon <= 1.0 ){
+	h_dxHCAL_cut_3->Fill( xHCAL - xexpect_HCAL );
+      }
+      if( Wrecon >= 1.0 && Wrecon <= 1.05 ){
+	h_dxHCAL_cut_4->Fill( xHCAL - xexpect_HCAL );
+      }
+      if( Wrecon >= 1.05 && Wrecon <= 1.1 ){
+	h_dxHCAL_cut_5->Fill( xHCAL - xexpect_HCAL );
       }
 
       T_xHCAL = xHCAL;
@@ -688,9 +744,6 @@ void hcal_dxdy_ld2( const char *configfilename,
       // * ----
 	
       BBcut = Wrecon >= Wmin_fit && Wrecon <= Wmax_fit && dpel >= dpelmin_fit && dpel <= dpelmax_fit;
-
-      h_W_nocut->Fill( Wrecon );
-      h_dpel_nocut->Fill( dpel );
 
       if( passed_n_cut ){
 	h_dpel_n_cut->Fill( dpel );
@@ -736,6 +789,8 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   TEllipse En;
   En.SetFillStyle(0);
+  
+  
   En.SetLineColor(6);
   En.SetLineWidth(4);
   En.DrawEllipse(dy0_n,dx0_n,2.5*dysigma_n,2.5*dxsigma_n,0,360,0);
@@ -746,13 +801,13 @@ void hcal_dxdy_ld2( const char *configfilename,
   fit_n->SetParameters( 500, h_W_n_cut->GetMean(), h_W_n_cut->GetRMS(), 1., 1., 1., 1. );
   fit_n->SetLineColor(2);
   fit_n->SetLineWidth(4);
-  h_W_n_cut->Fit(fit_n);
+  // h_W_n_cut->Fit(fit_n);
 
   TF1* fit_p = new TF1("fit_p", "gausn(0)+pol3(3)", 0.83, 1.13 );
   fit_p->SetParameters( 500, h_W_p_cut->GetMean(), h_W_p_cut->GetRMS(), 1., 1., 1., 1. );
   fit_p->SetLineColor(2);
   fit_p->SetLineWidth(4);
-  h_W_p_cut->Fit(fit_p);
+  // h_W_p_cut->Fit(fit_p);
  
   TString plotsfilename = outputfilename;
   plotsfilename.ReplaceAll(".root",".pdf");
@@ -760,7 +815,10 @@ void hcal_dxdy_ld2( const char *configfilename,
   c1->Print(plotsfilename.Data(),"pdf");
   plotsfilename.ReplaceAll(".pdf",".png");
   c1->Print(plotsfilename.Data(),"png");
+
+  fout->Write(); //fout->Close();
   
   elist->Delete();
-  fout->Write();
+  //fout->Delete();
+
 }
