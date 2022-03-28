@@ -38,6 +38,33 @@ double PI = TMath::Pi();
 double Mp = 0.938272;
 double Mn = 0.939565;
 
+//gaussian background function for deltax
+bool reject_bg = false;
+double bg_fit(double *x, double *par){
+  if (reject_bg && x[0]>-1.2 && x[0]<0.48){ //x[0]>-1.65 && x[0]<0.556) { 
+    TF1::RejectPoint();
+    return 0;
+  }
+  return par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
+}
+
+//background fitting for W distribution of n
+double W_bg_fit_pol6_n(double *x, double *par){
+  if (x[0]<0.07 && x[0]>0.86 ) {
+    TF1::RejectPoint();
+    return 0;
+  }
+  return par[0]+par[1]*x[0]+par[2]*pow(x[0],2.)+par[3]*pow(x[0],3.)
+    +par[4]*pow(x[0],4.)+par[5]*pow(x[0],5.);
+}
+double W_bg_fit_pol3_n(double *x, double *par){
+  if (x[0]<1.09 && x[0]>1.75 ) {
+    TF1::RejectPoint();
+    return 0;
+  }
+  return par[0] + par[1]*x[0] + par[2]*pow(x[0],2.);
+}
+
 void hcal_dxdy_ld2( const char *configfilename,
 		    const char *outputfilename="hcal_dxdy_ld2.root" )
 {
@@ -623,7 +650,7 @@ void hcal_dxdy_ld2( const char *configfilename,
       
       // Calculate the expected momentum of an elastically scattered electron at the reconstructed scattering angle and then correct it for the mean energy loss of the
       // electron on its way out of the target:
-      double pelastic = Ebeam_corrected/(1.+Ebeam_corrected/Mp*(1.0-cos(etheta))); 
+      double pelastic = Ebeam_corrected/(1.+(Ebeam_corrected/Mp)*(1.0-cos(etheta))); 
       
       double precon = p[0] + MeanEloss_outgoing; //reconstructed momentum, corrected for mean energy loss exiting the target (later we'll also want to include Al shielding on scattering chamber)
 
@@ -635,8 +662,8 @@ void hcal_dxdy_ld2( const char *configfilename,
       
       double Q2recon = 2.0*Ebeam_corrected*precon*(1.0-cos(etheta));
       double W2recon = pow(Mp,2) + 2.0*Mp*nu_recon - Q2recon;
-      double Wrecon;
-      if(W2recon>0) Wrecon = sqrt(W2recon); //sqrt( std::max(0.0,W2recon) );
+      double Wrecon; //= sqrt( std::max(0.0,W2recon) );
+      if(W2recon>0) Wrecon = sqrt(W2recon); 
       T_Q2 = Q2recon;
       T_W2 = W2recon;
       h_W->Fill( Wrecon );
@@ -723,24 +750,18 @@ void hcal_dxdy_ld2( const char *configfilename,
       //Cuts to choose only protons
       if( usepcut != 0 ){
 	passed_p_cut = pow( (xHCAL-xexpect_HCAL - dx0_p)/dxsigma_p, 2 ) +
-	  pow( (yHCAL-yexpect_HCAL - dy0_p)/dysigma_p, 2 ) <= pow(2.5,2); 
+	  pow( (yHCAL-yexpect_HCAL - dy0_p)/dysigma_p, 2 ) <= pow(1.5,2); 
       }
       pcut = pow( (xHCAL-xexpect_HCAL - dx0_p)/dxsigma_p, 2 ) +
-	pow( (yHCAL-yexpect_HCAL - dy0_p)/dysigma_p, 2 ) <= pow(2.5,2);      
+	pow( (yHCAL-yexpect_HCAL - dy0_p)/dysigma_p, 2 ) <= pow(1.5,2);      
 
       //Cuts to choose only neutrons
       if( usencut != 0 ){
 	passed_n_cut = pow( (xHCAL-xexpect_HCAL - dx0_n)/dxsigma_n, 2 ) +
-	  pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(2.5,2); 
+	  pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(1.5,2); 
       }
       ncut = pow( (xHCAL-xexpect_HCAL - dx0_n)/dxsigma_n, 2 ) +
-	pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(2.5,2); 
-
-      pcut = pow( (xHCAL-xexpect_HCAL - dx0_p)/dxsigma_p, 2 ) +
-	pow( (yHCAL-yexpect_HCAL - dy0_p)/dysigma_p, 2 ) <= pow(2.5,2);
-
-      ncut = pow( (xHCAL-xexpect_HCAL - dx0_n)/dxsigma_n, 2 ) +
-	pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(2.5,2);
+	pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(1.5,2); 
       // * ----
 	
       BBcut = Wrecon >= Wmin_fit && Wrecon <= Wmax_fit && dpel >= dpelmin_fit && dpel <= dpelmax_fit;
@@ -783,31 +804,83 @@ void hcal_dxdy_ld2( const char *configfilename,
   //illustrating proton and neutron spot cut regions
   TEllipse Ep;
   Ep.SetFillStyle(0);
-  Ep.SetLineColor(6);
+  Ep.SetLineColor(2);
   Ep.SetLineWidth(4);
-  Ep.DrawEllipse(dy0_p,dx0_p,2.5*dysigma_p,2.5*dxsigma_p,0,360,0);
+  Ep.DrawEllipse(dy0_p,dx0_p,1.5*dysigma_p,1.5*dxsigma_p,0,360,0);
 
   TEllipse En;
   En.SetFillStyle(0);
-  
-  
   En.SetLineColor(6);
   En.SetLineWidth(4);
-  En.DrawEllipse(dy0_n,dx0_n,2.5*dysigma_n,2.5*dxsigma_n,0,360,0);
+  En.DrawEllipse(dy0_n,dx0_n,1.5*dysigma_n,1.5*dxsigma_n,0,360,0);
 
   gStyle->SetOptFit(1111); 
-  //fitting W distributions to get n and p yields
-  TF1* fit_n = new TF1("fit_n", "gausn(0)+pol3(3)", 0.86, 1.1);
-  fit_n->SetParameters( 500, h_W_n_cut->GetMean(), h_W_n_cut->GetRMS(), 1., 1., 1., 1. );
-  fit_n->SetLineColor(2);
-  fit_n->SetLineWidth(4);
+  // //fitting W distributions to get n and p yields
+  // TF1* fit_n = new TF1("fit_n", "gausn(0)+pol3(3)", 0.86, 1.1);
+  // fit_n->SetParameters( 500, h_W_n_cut->GetMean(), h_W_n_cut->GetRMS(), 1., 1., 1., 1. );
+  // fit_n->SetLineColor(2);
+  // fit_n->SetLineWidth(4);
   // h_W_n_cut->Fit(fit_n);
 
-  TF1* fit_p = new TF1("fit_p", "gausn(0)+pol3(3)", 0.83, 1.13 );
-  fit_p->SetParameters( 500, h_W_p_cut->GetMean(), h_W_p_cut->GetRMS(), 1., 1., 1., 1. );
-  fit_p->SetLineColor(2);
-  fit_p->SetLineWidth(4);
+  // TF1* fit_p = new TF1("fit_p", "gausn(0)+pol3(3)", 0.83, 1.13 );
+  // fit_p->SetParameters( 500, h_W_p_cut->GetMean(), h_W_p_cut->GetRMS(), 1., 1., 1., 1. );
+  // fit_p->SetLineColor(2);
+  // fit_p->SetLineWidth(4);
   // h_W_p_cut->Fit(fit_p);
+
+  //fitting delta_x distribution
+  double par[9];
+  TF1* bg_func = new TF1("bg_func", bg_fit, -2.5, 2.5, 3 );
+  bg_func->SetParameters(480,-0.3,0.5); //(160,-0.42,.7); 
+  bg_func->SetLineColor(2);
+  reject_bg = true;
+  h_dxHCAL_cut->Fit(bg_func,"NR");
+  bg_func->GetParameters(&par[0]);
+  reject_bg = false;
+
+  TF1* p_func = new TF1("p_func", "gaus", -1.13, -0.2 ); //-1.34, -.74); 
+  p_func->SetParameters(1967,-0.58,0.16); //(406,-1.019,0.1826); 
+  p_func->SetLineColor(3);
+  h_dxHCAL_cut->Fit(p_func,"NR+");
+  p_func->GetParameters(&par[3]);
+
+  TF1* n_func = new TF1("n_func", "gaus", -0.2, 0.41 ); //-.2, .32);
+  n_func->SetParameters(662,-0.047,0.184); //(142,.071,.171); 
+  n_func->SetLineColor(4);
+  h_dxHCAL_cut->Fit(n_func,"NR+");
+  n_func->GetParameters(&par[6]);
+
+  TF1* total = new TF1("total","gaus(0)+gaus(3)+gaus(6)",-2.5,2.5);
+  total->SetLineColor(1);
+  total->SetParameters(par);
+  h_dxHCAL_cut->Fit(total,"NR+");
+  // *****
+
+  //fitting W for neutron
+  double par_n[12];
+  TF1* W_bg_pol6 = new TF1("W_bg_pol6", W_bg_fit_pol6_n, 0.07, 0.86, 6 );
+  bg_func->SetParameters(15,-380,3651,-16659,39208,-45722,21080);
+  bg_func->SetLineColor(2);
+  h_W_n_cut->Fit(W_bg_pol6,"NR");
+  W_bg_pol6->GetParameters(&par_n[0]);
+
+  TF1* W_n = new TF1("W_n", "gaus", 0.86, 1.09 );
+  n_func->SetParameters(603,0.973,0.09215);
+  n_func->SetLineColor(4);
+  h_W_n_cut->Fit(W_n,"NR+");
+  W_n->GetParameters(&par_n[7]);
+
+  TF1* W_bg_pol3 = new TF1("W_bg_pol3", W_bg_fit_pol6_n, 1.09, 1.75, 3 );
+  bg_func->SetParameters(-200,2220,-2413,670);
+  bg_func->SetLineColor(2);
+  h_W_n_cut->Fit(W_bg_pol3,"NR+");
+  W_bg_pol3->GetParameters(&par_n[10]);
+
+  TF1* total_n = new TF1("total_n","W_bg_pol6(0)+gausn(7)+W_bg_pol3(10)",0.07,1.75);
+  total_n->SetLineColor(1);
+  total_n->SetParameters(par_n);
+  h_W_n_cut->Fit(total_n,"R+");
+  // *****
  
   TString plotsfilename = outputfilename;
   plotsfilename.ReplaceAll(".root",".pdf");
