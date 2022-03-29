@@ -48,21 +48,16 @@ double bg_fit(double *x, double *par){
   return par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
 }
 
-//background fitting for W distribution of n
-double W_bg_fit_pol6_n(double *x, double *par){
-  if (x[0]<0.07 && x[0]>0.86 ) {
-    TF1::RejectPoint();
+double W_n_fit_total(double *x, double *par){
+  if (x[0]>0.07 && x[0]<0.76) {
+    return par[0] + par[1]*x[0] + par[2]*pow(x[0],2.) + par[3]*pow(x[0],3.);
+  }else if (x[0]>0.76 && x[0]<1.09) {
+    return par[4]*exp(-0.5*pow((x[0]-par[5])/par[6],2.));
+  }else if (x[0]>1.09 && x[0]<1.75) {
+    return par[7] + par[8]*x[0] + par[9]*pow(x[0],2.) + par[10]*pow(x[0],3.);
+  }else{
     return 0;
   }
-  return par[0]+par[1]*x[0]+par[2]*pow(x[0],2.)+par[3]*pow(x[0],3.)
-    +par[4]*pow(x[0],4.)+par[5]*pow(x[0],5.);
-}
-double W_bg_fit_pol3_n(double *x, double *par){
-  if (x[0]<1.09 && x[0]>1.75 ) {
-    TF1::RejectPoint();
-    return 0;
-  }
-  return par[0] + par[1]*x[0] + par[2]*pow(x[0],2.);
 }
 
 void hcal_dxdy_ld2( const char *configfilename,
@@ -815,19 +810,6 @@ void hcal_dxdy_ld2( const char *configfilename,
   En.DrawEllipse(dy0_n,dx0_n,1.5*dysigma_n,1.5*dxsigma_n,0,360,0);
 
   gStyle->SetOptFit(1111); 
-  // //fitting W distributions to get n and p yields
-  // TF1* fit_n = new TF1("fit_n", "gausn(0)+pol3(3)", 0.86, 1.1);
-  // fit_n->SetParameters( 500, h_W_n_cut->GetMean(), h_W_n_cut->GetRMS(), 1., 1., 1., 1. );
-  // fit_n->SetLineColor(2);
-  // fit_n->SetLineWidth(4);
-  // h_W_n_cut->Fit(fit_n);
-
-  // TF1* fit_p = new TF1("fit_p", "gausn(0)+pol3(3)", 0.83, 1.13 );
-  // fit_p->SetParameters( 500, h_W_p_cut->GetMean(), h_W_p_cut->GetRMS(), 1., 1., 1., 1. );
-  // fit_p->SetLineColor(2);
-  // fit_p->SetLineWidth(4);
-  // h_W_p_cut->Fit(fit_p);
-
   //fitting delta_x distribution
   double par[9];
   TF1* bg_func = new TF1("bg_func", bg_fit, -2.5, 2.5, 3 );
@@ -853,33 +835,15 @@ void hcal_dxdy_ld2( const char *configfilename,
   TF1* total = new TF1("total","gaus(0)+gaus(3)+gaus(6)",-2.5,2.5);
   total->SetLineColor(1);
   total->SetParameters(par);
-  h_dxHCAL_cut->Fit(total,"NR+");
+  h_dxHCAL_cut->Fit(total,"R+");
   // *****
 
-  //fitting W for neutron
-  double par_n[12];
-  TF1* W_bg_pol6 = new TF1("W_bg_pol6", W_bg_fit_pol6_n, 0.07, 0.86, 6 );
-  bg_func->SetParameters(15,-380,3651,-16659,39208,-45722,21080);
-  bg_func->SetLineColor(2);
-  h_W_n_cut->Fit(W_bg_pol6,"NR");
-  W_bg_pol6->GetParameters(&par_n[0]);
-
-  TF1* W_n = new TF1("W_n", "gaus", 0.86, 1.09 );
-  n_func->SetParameters(603,0.973,0.09215);
-  n_func->SetLineColor(4);
-  h_W_n_cut->Fit(W_n,"NR+");
-  W_n->GetParameters(&par_n[7]);
-
-  TF1* W_bg_pol3 = new TF1("W_bg_pol3", W_bg_fit_pol6_n, 1.09, 1.75, 3 );
-  bg_func->SetParameters(-200,2220,-2413,670);
-  bg_func->SetLineColor(2);
-  h_W_n_cut->Fit(W_bg_pol3,"NR+");
-  W_bg_pol3->GetParameters(&par_n[10]);
-
-  TF1* total_n = new TF1("total_n","W_bg_pol6(0)+gausn(7)+W_bg_pol3(10)",0.07,1.75);
-  total_n->SetLineColor(1);
-  total_n->SetParameters(par_n);
-  h_W_n_cut->Fit(total_n,"R+");
+  //fitting W for neutron for SBS30%
+  // double par_n[11];
+  // TF1* total_n = new TF1("total_n",W_n_fit_total,0.07,1.75,11);
+  // total_n->SetLineColor(2);
+  // total_n->SetParameters(-2.031,54,-234,322,590,0.973,0.0967,-200,2220,-2413,670);
+  // h_W_n_cut->Fit(total_n,"R+");
   // *****
  
   TString plotsfilename = outputfilename;
