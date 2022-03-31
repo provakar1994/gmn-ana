@@ -492,13 +492,13 @@ void hcal_dxdy_ld2( const char *configfilename,
   TH2D *h2_dxdyHCAL_cut = new TH2D("h2_dxdyHCAL_cut","; yHCAL - yBB (m); xHCAL - xBB (m)",
 				   250, -1.25,1.25, 250,-2.5,2.5);
   
-  TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";yHCAL (m);xHCAL (m)",12,-0.975,0.975,24,-2.24,1.51);
+  TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";yHCAL (m);xHCAL (m)",12,-0.9,0.9,24,-2.165,1.435);
   TH2D *h2_xyHCAL_W_cut = new TH2D("h2_xyHCAL_W_cut",";yHCAL (m);xHCAL (m)"
-				   ,12,-0.975,0.975,24,-2.24,1.51);
+				   ,12,-0.9,0.9,24,-2.165,1.435);
   TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","xHCAL vs yHCAL w/ W & p spot cut;yHCAL (m);xHCAL (m)"
-				   ,12,-0.975,0.975,24,-2.24,1.51);
+				   ,12,-0.9,0.9,24,-2.165,1.435);
   TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","xHCAL vs yHCAL w/ W & n spot cut;yHCAL (m);xHCAL (m)"
-				   ,12,-0.975,0.975,24,-2.24,1.51);
+				   ,12,-0.9,0.9,24,-2.165,1.435);
 
   TH2D *h2_W_vs_dxHCAL = new TH2D("h2_W_vs_dxHCAL","; xHCAL - xBB (m); W (GeV)", 250,-2.5,2.5,250,0,2);
 
@@ -795,14 +795,14 @@ void hcal_dxdy_ld2( const char *configfilename,
 	// h2_W_ytar->Fill( ytgt[0], Wrecon );     	
       }
 
-      //fiducial cut region
+      //**** fiducial cut ****
       if( Wrecon >= Wmin && Wrecon <= Wmax ){
 	//if( passed_n_cut ) h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
 	if( passed_p_cut
-	    && yexpect_HCAL>-.8 && yexpect_HCAL<.8 
-	    && xexpect_HCAL>-2. && xexpect_HCAL<1.3
-	    && yHCAL>-0.8 && yHCAL<0.8
-	    && xHCAL>-2.)
+	    && yexpect_HCAL>-.6 && yexpect_HCAL<.6 
+	    && xexpect_HCAL>-1.865 && xexpect_HCAL<1.135
+	    && yHCAL>-0.6 && yHCAL<0.6
+	    && xHCAL>-1.865)
 	  {
 	    h2_xyHCAL_p_cut->Fill(yHCAL,xHCAL);
 	    h2_xyHCAL_n_cut->Fill(yexpect_HCAL,xexpect_HCAL);
@@ -849,34 +849,34 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   TLine L1h_p;
   L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
-  L1h_p.DrawLine(-0.975,1.3,0.975,1.3);
+  L1h_p.DrawLine(-0.9,1.135,0.9,1.135);
   TLine L2h_p;
   L2h_p.SetLineColor(2); L2h_p.SetLineWidth(4); L2h_p.SetLineStyle(9);
-  L2h_p.DrawLine(-0.975,-2.0,0.975,-2.0);
+  L2h_p.DrawLine(-0.9,-1.865,0.9,-1.865);
   
   TLine L1v_p;
   L1v_p.SetLineColor(2); L1v_p.SetLineWidth(4); L1v_p.SetLineStyle(9);
-  L1v_p.DrawLine(-0.8,-2.24,-0.8,1.51);
+  L1v_p.DrawLine(-0.6,-2.165,-0.6,1.435);
   TLine L2v_p;
   L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
-  L2v_p.DrawLine(0.8,-2.24,0.8,1.51);
+  L2v_p.DrawLine(0.6,-2.165,0.6,1.435);
   
   c1->cd(4);
   h2_xyHCAL_n_cut->Draw("colz");
 
   TLine L1h_n;
   L1h_n.SetLineColor(2); L1h_n.SetLineWidth(4); L1h_n.SetLineStyle(9);
-  L1h_n.DrawLine(-0.975,1.3,0.975,1.3);
+  L1h_n.DrawLine(-0.9,1.135,0.9,1.135);
   TLine L2h_n;
   L2h_n.SetLineColor(2); L2h_n.SetLineWidth(4); L2h_n.SetLineStyle(9);
-  L2h_n.DrawLine(-0.975,-2.0,0.975,-2.0);
+  L2h_n.DrawLine(-0.9,-1.865,0.9,-1.865);
   
   TLine L1v_n;
   L1v_n.SetLineColor(2); L1v_n.SetLineWidth(4); L1v_n.SetLineStyle(9);
-  L1v_n.DrawLine(-0.8,-2.24,-0.8,1.51);
+  L1v_n.DrawLine(-0.6,-2.165,-0.6,1.435);
   TLine L2v_n;
   L2v_n.SetLineColor(2); L2v_n.SetLineWidth(4); L2v_n.SetLineStyle(9);
-  L2v_n.DrawLine(0.8,-2.24,0.8,1.51);
+  L2v_n.DrawLine(0.6,-2.165,0.6,1.435);
   // ******
 
   //fitting delta_x distribution
@@ -918,17 +918,17 @@ void hcal_dxdy_ld2( const char *configfilename,
   TF1 *nFcn = new TF1("nFcn","gaus",-2.5,2.5);
   nFcn->SetLineColor(kBlue);
 
-  backFcn->SetParameters(par_f[0],par_f[1],par_f[2]); backFcn->DrawClone("same");
-  pFcn->SetParameters(par_f[3],par_f[4],par_f[5]); pFcn->DrawClone("same");
-  nFcn->SetParameters(par_f[6],par_f[7],par_f[8]); nFcn->DrawClone("same");
+  backFcn->SetParameters(&par_f[0]); backFcn->Draw("same");
+  pFcn->SetParameters(&par_f[3]); pFcn->Draw("same");
+  nFcn->SetParameters(&par_f[6]); nFcn->Draw("same");
   p_count = (int)pFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
-  n_count = nFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
+  n_count = (int)nFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
  
   cout << endl << "------" << endl;
-  cout << " neutron count= " << n_count << endl;
-  cout << " proton count= " << p_count << endl;
-  cout << " Ratio= " << n_count/p_count << endl;
-  cout << " Sqrt(Ratio)= " << sqrt(n_count/p_count) << endl;
+  cout << " n count = " << n_count << endl;
+  cout << " p count = " << p_count << endl;
+  cout << " R = " << n_count/p_count << endl;
+  cout << " Sqrt(R) = " << sqrt(n_count/p_count) << endl;
   cout << "------" << endl;
   // *****
 
