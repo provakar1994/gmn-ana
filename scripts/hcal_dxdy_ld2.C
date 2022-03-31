@@ -131,8 +131,8 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   double dpelmin_fit = -0.03;
   double dpelmax_fit = 0.03;
-  double Wmin_fit = 0.86;
-  double Wmax_fit = 1.02; 
+  double Wmin = 0.86;
+  double Wmax = 1.02; 
 
   //To calculate a proper dx, dy for HCAL, we need
   double hcalheight = -0.2275; //0.365; //m (we are guessing that this is the height of the center of HCAL above beam height:
@@ -295,12 +295,12 @@ void hcal_dxdy_ld2( const char *configfilename,
 
 	if( skey == "Wmin" ){ //Wmin to include in fit
 	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
-	  Wmin_fit = stemp.Atof();
+	  Wmin = stemp.Atof();
 	}
 
 	if( skey == "Wmax" ){ //Wmax to include in fit
 	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
-	  Wmax_fit = stemp.Atof();
+	  Wmax = stemp.Atof();
 	}
 
 	if( skey == "fix_pth0" ){
@@ -480,21 +480,27 @@ void hcal_dxdy_ld2( const char *configfilename,
   TH1D *h_dyHCAL = new TH1D("h_dyHCAL","; yHCAL - yBB (m);", 250, -1.25,1.25);
 
   TH1D *h_dxHCAL_cut = new TH1D("h_dxHCAL_cut","; xHCAL - xBB (m);", 250, -2.5,2.5);
-
-  TH1D *h_dxHCAL_cut_1 = new TH1D("h_dxHCAL_cut_1","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dxHCAL_cut_2 = new TH1D("h_dxHCAL_cut_2","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dxHCAL_cut_3 = new TH1D("h_dxHCAL_cut_3","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dxHCAL_cut_4 = new TH1D("h_dxHCAL_cut_4","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dxHCAL_cut_5 = new TH1D("h_dxHCAL_cut_5","; xHCAL - xBB (m);", 250, -2.5,2.5);
-
-  TH2D *h_W_vs_dxHCAL = new TH2D("h_W_vs_dxHCAL","; xHCAL - xBB (m); W (GeV)", 250,-2.5,2.5,250,0,2);
-  
-  TH1D *h_dyHCAL_cut = new TH1D("h_dyHCAL_cut","; yHCAL - yBB (m);", 250, -1.25,1.25);
+  // TH1D *h_dxHCAL_cut_1 = new TH1D("h_dxHCAL_cut_1","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_2 = new TH1D("h_dxHCAL_cut_2","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_3 = new TH1D("h_dxHCAL_cut_3","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_4 = new TH1D("h_dxHCAL_cut_4","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_5 = new TH1D("h_dxHCAL_cut_5","; xHCAL - xBB (m);", 250, -2.5,2.5);
+  TH1D *h_dyHCAL_cut = new TH1D("h_dyHCAL_cut","; yHCAL - yBB (m);", 250, -1.25,1.25);  
 
   TH2D *h2_dxdyHCAL = new TH2D("h2_dxdyHCAL","; yHCAL - yBB (m); xHCAL - xBB (m)",
 			       250, -1.25,1.25, 250,-2.5,2.5);
   TH2D *h2_dxdyHCAL_cut = new TH2D("h2_dxdyHCAL_cut","; yHCAL - yBB (m); xHCAL - xBB (m)",
 				   250, -1.25,1.25, 250,-2.5,2.5);
+  
+  TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";yHCAL (m);xHCAL (m)",12,-0.975,0.975,24,-2.24,1.51);
+  TH2D *h2_xyHCAL_W_cut = new TH2D("h2_xyHCAL_W_cut",";yHCAL (m);xHCAL (m)"
+				   ,12,-0.975,0.975,24,-2.24,1.51);
+  TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","xHCAL vs yHCAL w/ W & p spot cut;yHCAL (m);xHCAL (m)"
+				   ,12,-0.975,0.975,24,-2.24,1.51);
+  TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","xHCAL vs yHCAL w/ W & n spot cut;yHCAL (m);xHCAL (m)"
+				   ,12,-0.975,0.975,24,-2.24,1.51);
+
+  TH2D *h2_W_vs_dxHCAL = new TH2D("h2_W_vs_dxHCAL","; xHCAL - xBB (m); W (GeV)", 250,-2.5,2.5,250,0,2);
 
   // TH2D *h2_dpel_xfp = new TH2D("h2_dpel_xfp", "; xfp (m); p/p_{elastic}(#theta)-1",
   // 			       250,-0.75,0.75,250,-0.125,0.125);
@@ -709,30 +715,32 @@ void hcal_dxdy_ld2( const char *configfilename,
       h_dxHCAL->Fill( xHCAL - xexpect_HCAL );
       h_dyHCAL->Fill( yHCAL - yexpect_HCAL );
       h2_dxdyHCAL->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
+      h2_xyHCAL->Fill(yHCAL,xHCAL);
 
-      h_W_vs_dxHCAL->Fill( xHCAL - xexpect_HCAL, Wrecon );
+      h2_W_vs_dxHCAL->Fill( xHCAL - xexpect_HCAL, Wrecon );
 
-      if( Wrecon >= Wmin_fit && Wrecon <= Wmax_fit ){
-	h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
+      if( Wrecon >= Wmin && Wrecon <= Wmax ){
+	//h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
 	h_dyHCAL_cut->Fill( yHCAL - yexpect_HCAL );
 	h2_dxdyHCAL_cut->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
+	h2_xyHCAL_W_cut->Fill(yHCAL,xHCAL);
       }
 
-      if( Wrecon >= 0.85 && Wrecon <= 0.9 ){
-	h_dxHCAL_cut_1->Fill( xHCAL - xexpect_HCAL );
-      }
-      if( Wrecon >= 0.9 && Wrecon <= 0.95 ){
-	h_dxHCAL_cut_2->Fill( xHCAL - xexpect_HCAL );
-      }
-      if( Wrecon >= 0.95 && Wrecon <= 1.0 ){
-	h_dxHCAL_cut_3->Fill( xHCAL - xexpect_HCAL );
-      }
-      if( Wrecon >= 1.0 && Wrecon <= 1.05 ){
-	h_dxHCAL_cut_4->Fill( xHCAL - xexpect_HCAL );
-      }
-      if( Wrecon >= 1.05 && Wrecon <= 1.1 ){
-	h_dxHCAL_cut_5->Fill( xHCAL - xexpect_HCAL );
-      }
+      // if( Wrecon >= 0.85 && Wrecon <= 0.9 ){
+      // 	h_dxHCAL_cut_1->Fill( xHCAL - xexpect_HCAL );
+      // }
+      // if( Wrecon >= 0.9 && Wrecon <= 0.95 ){
+      // 	h_dxHCAL_cut_2->Fill( xHCAL - xexpect_HCAL );
+      // }
+      // if( Wrecon >= 0.95 && Wrecon <= 1.0 ){
+      // 	h_dxHCAL_cut_3->Fill( xHCAL - xexpect_HCAL );
+      // }
+      // if( Wrecon >= 1.0 && Wrecon <= 1.05 ){
+      // 	h_dxHCAL_cut_4->Fill( xHCAL - xexpect_HCAL );
+      // }
+      // if( Wrecon >= 1.05 && Wrecon <= 1.1 ){
+      // 	h_dxHCAL_cut_5->Fill( xHCAL - xexpect_HCAL );
+      // }
 
       T_xHCAL = xHCAL;
       T_yHCAL = yHCAL;
@@ -740,6 +748,8 @@ void hcal_dxdy_ld2( const char *configfilename,
       T_deltax = xHCAL - xexpect_HCAL;
       T_deltay = yHCAL - yexpect_HCAL;
 
+      // h2_xyHCAL->Fill(yHCAL,xHCAL);
+      
       // * ---- Defining various cuts
       bool passed_p_cut=true, passed_n_cut=true;
       //Cuts to choose only protons
@@ -759,7 +769,7 @@ void hcal_dxdy_ld2( const char *configfilename,
 	pow( (yHCAL-yexpect_HCAL - dy0_n)/dysigma_n, 2 ) <= pow(1.5,2); 
       // * ----
 	
-      BBcut = Wrecon >= Wmin_fit && Wrecon <= Wmax_fit && dpel >= dpelmin_fit && dpel <= dpelmax_fit;
+      BBcut = Wrecon >= Wmin && Wrecon <= Wmax && dpel >= dpelmin_fit && dpel <= dpelmax_fit;
 
       if( passed_n_cut ){
 	h_dpel_n_cut->Fill( dpel );
@@ -768,8 +778,7 @@ void hcal_dxdy_ld2( const char *configfilename,
             
       if( passed_p_cut ){
 	h_dpel_p_cut->Fill( dpel );
-	h_W_p_cut->Fill( Wrecon );
-	
+	h_W_p_cut->Fill( Wrecon );	
 	// h2_dpel_xfp->Fill( xfp[0], dpel );
 	// h2_dpel_yfp->Fill( yfp[0], dpel );
 	// h2_dpel_xpfp->Fill( thfp[0], dpel );
@@ -786,17 +795,41 @@ void hcal_dxdy_ld2( const char *configfilename,
 	// h2_W_ytar->Fill( ytgt[0], Wrecon );     	
       }
 
+      //fiducial cut region
+      if( Wrecon >= Wmin && Wrecon <= Wmax ){
+	//if( passed_n_cut ) h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
+	if( passed_p_cut
+	    && yexpect_HCAL>-.8 && yexpect_HCAL<.8 
+	    && xexpect_HCAL>-2. && xexpect_HCAL<1.3
+	    && yHCAL>-0.8 && yHCAL<0.8
+	    && xHCAL>-2.)
+	  {
+	    h2_xyHCAL_p_cut->Fill(yHCAL,xHCAL);
+	    h2_xyHCAL_n_cut->Fill(yexpect_HCAL,xexpect_HCAL);
+	  }
+      }
+
+      if( Wrecon >= Wmin && Wrecon <= Wmax
+	  && yexpect_HCAL>-.8 && yexpect_HCAL<.8 
+	  && xexpect_HCAL>-2. && xexpect_HCAL<1.3
+	  && yHCAL>-0.8 && yHCAL<0.8
+	  && xHCAL>-2.){
+	h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
+      }
+      
       Tout->Fill();     
     }
   }
 
   cout << endl;
 
-  TCanvas *c1 = new TCanvas("c1","c1",400,1000);
-  c1->cd()->SetGrid();
-  h2_dxdyHCAL_cut->Draw("colz");
+  TCanvas *c1 = new TCanvas("c1","c1",1600,1200);
+  c1->Divide(2,2);
 
   //illustrating proton and neutron spot cut regions
+  c1->cd(1)->SetGrid();
+  h2_dxdyHCAL_cut->Draw("colz");
+
   TEllipse Ep;
   Ep.SetFillStyle(0);
   Ep.SetLineColor(2);
@@ -808,10 +841,48 @@ void hcal_dxdy_ld2( const char *configfilename,
   En.SetLineColor(6);
   En.SetLineWidth(4);
   En.DrawEllipse(dy0_n,dx0_n,1.5*dysigma_n,1.5*dxsigma_n,0,360,0);
+  // ******
 
-  gStyle->SetOptFit(1111); 
+  //fiducial cut visualization
+  c1->cd(3);
+  h2_xyHCAL_p_cut->Draw("colz");
+
+  TLine L1h_p;
+  L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
+  L1h_p.DrawLine(-0.975,1.3,0.975,1.3);
+  TLine L2h_p;
+  L2h_p.SetLineColor(2); L2h_p.SetLineWidth(4); L2h_p.SetLineStyle(9);
+  L2h_p.DrawLine(-0.975,-2.0,0.975,-2.0);
+  
+  TLine L1v_p;
+  L1v_p.SetLineColor(2); L1v_p.SetLineWidth(4); L1v_p.SetLineStyle(9);
+  L1v_p.DrawLine(-0.8,-2.24,-0.8,1.51);
+  TLine L2v_p;
+  L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
+  L2v_p.DrawLine(0.8,-2.24,0.8,1.51);
+  
+  c1->cd(4);
+  h2_xyHCAL_n_cut->Draw("colz");
+
+  TLine L1h_n;
+  L1h_n.SetLineColor(2); L1h_n.SetLineWidth(4); L1h_n.SetLineStyle(9);
+  L1h_n.DrawLine(-0.975,1.3,0.975,1.3);
+  TLine L2h_n;
+  L2h_n.SetLineColor(2); L2h_n.SetLineWidth(4); L2h_n.SetLineStyle(9);
+  L2h_n.DrawLine(-0.975,-2.0,0.975,-2.0);
+  
+  TLine L1v_n;
+  L1v_n.SetLineColor(2); L1v_n.SetLineWidth(4); L1v_n.SetLineStyle(9);
+  L1v_n.DrawLine(-0.8,-2.24,-0.8,1.51);
+  TLine L2v_n;
+  L2v_n.SetLineColor(2); L2v_n.SetLineWidth(4); L2v_n.SetLineStyle(9);
+  L2v_n.DrawLine(0.8,-2.24,0.8,1.51);
+  // ******
+
   //fitting delta_x distribution
-  double par[9];
+  c1->cd(2);
+  gStyle->SetOptFit(1111); 
+  double par[9], par_f[9];
   TF1* bg_func = new TF1("bg_func", bg_fit, -2.5, 2.5, 3 );
   bg_func->SetParameters(480,-0.3,0.5); //(160,-0.42,.7); 
   bg_func->SetLineColor(2);
@@ -836,6 +907,29 @@ void hcal_dxdy_ld2( const char *configfilename,
   total->SetLineColor(1);
   total->SetParameters(par);
   h_dxHCAL_cut->Fit(total,"R+");
+  total->GetParameters(par_f);
+
+  //visulaization and extraction of physics results
+  double n_count, p_count;
+  TF1 *backFcn = new TF1("backFcn","gaus",-2.5,2.5);
+  backFcn->SetLineColor(kRed);
+  TF1 *pFcn = new TF1("pFcn","gaus",-2.5,2.5);
+  pFcn->SetLineColor(kGreen);
+  TF1 *nFcn = new TF1("nFcn","gaus",-2.5,2.5);
+  nFcn->SetLineColor(kBlue);
+
+  backFcn->SetParameters(par_f[0],par_f[1],par_f[2]); backFcn->DrawClone("same");
+  pFcn->SetParameters(par_f[3],par_f[4],par_f[5]); pFcn->DrawClone("same");
+  nFcn->SetParameters(par_f[6],par_f[7],par_f[8]); nFcn->DrawClone("same");
+  p_count = (int)pFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
+  n_count = nFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
+ 
+  cout << endl << "------" << endl;
+  cout << " neutron count= " << n_count << endl;
+  cout << " proton count= " << p_count << endl;
+  cout << " Ratio= " << n_count/p_count << endl;
+  cout << " Sqrt(Ratio)= " << sqrt(n_count/p_count) << endl;
+  cout << "------" << endl;
   // *****
 
   //fitting W for neutron for SBS30%
