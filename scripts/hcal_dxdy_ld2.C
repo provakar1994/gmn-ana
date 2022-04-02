@@ -38,27 +38,33 @@ double PI = TMath::Pi();
 double Mp = 0.938272;
 double Mn = 0.939565;
 
+int SBSM=30;
+
 //gaussian background function for deltax
 bool reject_bg = false;
 double bg_fit(double *x, double *par){
-  if (reject_bg && x[0]>-1.2 && x[0]<0.48){ //x[0]>-1.65 && x[0]<0.556) { 
+  if (SBSM==30 && reject_bg && x[0]>-1.2 && x[0]<0.48) { 
+    TF1::RejectPoint();
+    return 0;
+  }
+  if (SBSM==50 && reject_bg && x[0]>-1.65 && x[0]<0.556) {  
     TF1::RejectPoint();
     return 0;
   }
   return par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
 }
 
-double W_n_fit_total(double *x, double *par){
-  if (x[0]>0.07 && x[0]<0.76) {
-    return par[0] + par[1]*x[0] + par[2]*pow(x[0],2.) + par[3]*pow(x[0],3.);
-  }else if (x[0]>0.76 && x[0]<1.09) {
-    return par[4]*exp(-0.5*pow((x[0]-par[5])/par[6],2.));
-  }else if (x[0]>1.09 && x[0]<1.75) {
-    return par[7] + par[8]*x[0] + par[9]*pow(x[0],2.) + par[10]*pow(x[0],3.);
-  }else{
-    return 0;
-  }
-}
+// double W_n_fit_total(double *x, double *par){
+//   if (x[0]>0.07 && x[0]<0.76) {
+//     return par[0] + par[1]*x[0] + par[2]*pow(x[0],2.) + par[3]*pow(x[0],3.);
+//   }else if (x[0]>0.76 && x[0]<1.09) {
+//     return par[4]*exp(-0.5*pow((x[0]-par[5])/par[6],2.));
+//   }else if (x[0]>1.09 && x[0]<1.75) {
+//     return par[7] + par[8]*x[0] + par[9]*pow(x[0],2.) + par[10]*pow(x[0],3.);
+//   }else{
+//     return 0;
+//   }
+// }
 
 void hcal_dxdy_ld2( const char *configfilename,
 		    const char *outputfilename="hcal_dxdy_ld2.root" )
@@ -135,7 +141,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   double Wmax = 1.02; 
 
   //To calculate a proper dx, dy for HCAL, we need
-  double hcalheight = -0.2275; //0.365; //m (we are guessing that this is the height of the center of HCAL above beam height:
+  double hcalheight = -0.2897; //-0.2275; //0.365; //m (we are guessing that this is the height of the center of HCAL above beam height:
   //The following are the positions of the "first" row and column from HCAL database (top right block as viewed from upstream)
   double xoff_hcal = -2.090; //0.92835;
   double yoff_hcal = -0.825; //0.47305; 
@@ -162,7 +168,11 @@ void hcal_dxdy_ld2( const char *configfilename,
 
       if( ntokens >= 2 ){
 	TString skey = ( (TObjString*) (*tokens)[0] )->GetString();
-
+	if( skey == "SBSM" ){
+	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
+	  SBSM = stemp.Atoi();
+	}
+	
 	if( skey == "model" ){
 	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
 	  model = stemp.Atoi();
@@ -338,6 +348,12 @@ void hcal_dxdy_ld2( const char *configfilename,
       tokens->Delete();
     }
   }
+
+  if(SBSM==30)
+    outputfilename = "sbs4_sbs30p_ld2.root";
+  if(SBSM==50)
+    outputfilename = "sbs4_sbs50p_ld2.root";
+  
   
   //Note that both of these calculations neglect the Aluminum end windows and cell walls:
   
@@ -476,31 +492,36 @@ void hcal_dxdy_ld2( const char *configfilename,
   TH1D *h_dpel_n_cut = new TH1D("h_dpel_n_cut",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
   TH1D *h_dpel_p_cut = new TH1D("h_dpel_p_cut",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
 
-  TH1D *h_dxHCAL = new TH1D("h_dxHCAL","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dyHCAL = new TH1D("h_dyHCAL","; yHCAL - yBB (m);", 250, -1.25,1.25);
+  TH1D *h_dxHCAL = new TH1D("h_dxHCAL","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  TH1D *h_dyHCAL = new TH1D("h_dyHCAL","; y_{HCAL} - y_{exp} (m);", 250, -1.25,1.25);
 
-  TH1D *h_dxHCAL_cut = new TH1D("h_dxHCAL_cut","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  // TH1D *h_dxHCAL_cut_1 = new TH1D("h_dxHCAL_cut_1","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  // TH1D *h_dxHCAL_cut_2 = new TH1D("h_dxHCAL_cut_2","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  // TH1D *h_dxHCAL_cut_3 = new TH1D("h_dxHCAL_cut_3","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  // TH1D *h_dxHCAL_cut_4 = new TH1D("h_dxHCAL_cut_4","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  // TH1D *h_dxHCAL_cut_5 = new TH1D("h_dxHCAL_cut_5","; xHCAL - xBB (m);", 250, -2.5,2.5);
-  TH1D *h_dyHCAL_cut = new TH1D("h_dyHCAL_cut","; yHCAL - yBB (m);", 250, -1.25,1.25);  
+  TH1D *h_dxHCAL_cut = new TH1D("h_dxHCAL_cut","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_1 = new TH1D("h_dxHCAL_cut_1","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_2 = new TH1D("h_dxHCAL_cut_2","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_3 = new TH1D("h_dxHCAL_cut_3","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_4 = new TH1D("h_dxHCAL_cut_4","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  // TH1D *h_dxHCAL_cut_5 = new TH1D("h_dxHCAL_cut_5","; x_{HCAL} - x_{exp} (m);", 250, -2.5,2.5);
+  TH1D *h_dyHCAL_cut = new TH1D("h_dyHCAL_cut","; y_{HCAL} - y_{exp} (m);", 250, -1.25,1.25);  
 
-  TH2D *h2_dxdyHCAL = new TH2D("h2_dxdyHCAL","; yHCAL - yBB (m); xHCAL - xBB (m)",
+  TH2D *h2_dxdyHCAL = new TH2D("h2_dxdyHCAL","; y_{HCAL} - y_{exp} (m); x_{HCAL} - x_{exp} (m)",
 			       250, -1.25,1.25, 250,-2.5,2.5);
-  TH2D *h2_dxdyHCAL_cut = new TH2D("h2_dxdyHCAL_cut","; yHCAL - yBB (m); xHCAL - xBB (m)",
+  TH2D *h2_dxdyHCAL_cut = new TH2D("h2_dxdyHCAL_cut","; y_{HCAL} - y_{exp} (m); x_{HCAL} - x_{exp} (m)",
 				   250, -1.25,1.25, 250,-2.5,2.5);
   
-  TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";yHCAL (m);xHCAL (m)",12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyHCAL_W_cut = new TH2D("h2_xyHCAL_W_cut",";yHCAL (m);xHCAL (m)"
+  TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";y_{HCAL} (m);x_{HCAL} (m)",12,-0.9,0.9,24,-2.165,1.435);
+  TH2D *h2_xyHCAL_W_cut = new TH2D("h2_xyHCAL_W_cut",";y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","xHCAL vs yHCAL w/ W & p spot cut;yHCAL (m);xHCAL (m)"
+  TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","x_{HCAL} vs y_{HCAL} w/ W & p spot cut;y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","xHCAL vs yHCAL w/ W & n spot cut;yHCAL (m);xHCAL (m)"
+  TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","x_{HCAL} vs y_{HCAL} w/ W & n spot cut;y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
 
-  TH2D *h2_W_vs_dxHCAL = new TH2D("h2_W_vs_dxHCAL","; xHCAL - xBB (m); W (GeV)", 250,-2.5,2.5,250,0,2);
+  TH2D *h2_xyBB_p_exp = new TH2D("h2_xyBB_p_exp","x_{exp}-0.64 vs y_{exp} w/ W & n spot cut (exp. p pos.);y_{exp} (m);x_{exp}-0.64 (m)"
+				   ,12,-0.9,0.9,24,-2.165,1.435);
+  TH2D *h2_xyBB_n_exp = new TH2D("h2_xyBB_n_exp","x_{exp} vs y_{exp} w/ W & p spot cut (exp. n pos.);y_{exp} (m);x_{exp} (m)"
+				   ,12,-0.9,0.9,24,-2.165,1.435);
+
+  TH2D *h2_W_vs_dxHCAL = new TH2D("h2_W_vs_dxHCAL","; x_{HCAL} - x_{exp} (m); W (GeV)", 250,-2.5,2.5,250,0,2);
 
   // TH2D *h2_dpel_xfp = new TH2D("h2_dpel_xfp", "; xfp (m); p/p_{elastic}(#theta)-1",
   // 			       250,-0.75,0.75,250,-0.125,0.125);
@@ -796,26 +817,34 @@ void hcal_dxdy_ld2( const char *configfilename,
       }
 
       //**** fiducial cut ****
+      bool fidu_cut;
+      double deltax_shift;
+      if(SBSM==30){
+	deltax_shift=0.65;
+	fidu_cut = (yexpect_HCAL-0.26)>-.75 && (yexpect_HCAL+0.26)<.75 && (xexpect_HCAL-deltax_shift-0.175)>-2.015 && (xexpect_HCAL+0.187)<1.285 && yHCAL>-0.75 && yHCAL<0.75 && xHCAL>-2.015 && xHCAL<1.285;
+      }
+      else if(SBSM==50){
+	delta_shift=1.09;
+	fidu_cut = (yexpect_HCAL-0.26)>-.75 && (yexpect_HCAL+0.26)<.75 && (xexpect_HCAL-deltax_shift-0.16)>-2.015 && (xexpect_HCAL+0.19)<1.285 && yHCAL>-0.75 && yHCAL<0.75 && xHCAL>-2.015 && xHCAL<1.285;
+      }
+      
       if( Wrecon >= Wmin && Wrecon <= Wmax ){
-	//if( passed_n_cut ) h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
-	if( passed_p_cut
-	    && yexpect_HCAL>-.6 && yexpect_HCAL<.6 
-	    && xexpect_HCAL>-1.865 && xexpect_HCAL<1.135
-	    && yHCAL>-0.6 && yHCAL<0.6
-	    && xHCAL>-1.865)
+	if( passed_n_cut && fidu_cut )
+	  {
+	    h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
+	    h2_xyBB_p_exp->Fill(yexpect_HCAL,xexpect_HCAL-deltax_shift);  // xexpect_HCAL-0.65);
+	  }
+	if( passed_p_cut && fidu_cut )
 	  {
 	    h2_xyHCAL_p_cut->Fill(yHCAL,xHCAL);
-	    h2_xyHCAL_n_cut->Fill(yexpect_HCAL,xexpect_HCAL);
+	    h2_xyBB_n_exp->Fill(yexpect_HCAL,xexpect_HCAL);
 	  }
       }
 
-      if( Wrecon >= Wmin && Wrecon <= Wmax
-	  && yexpect_HCAL>-.8 && yexpect_HCAL<.8 
-	  && xexpect_HCAL>-2. && xexpect_HCAL<1.3
-	  && yHCAL>-0.8 && yHCAL<0.8
-	  && xHCAL>-2.){
-	h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
-      }
+      if( Wrecon >= Wmin && Wrecon <= Wmax && fidu_sbs4_sbs50p )
+	{
+	  h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
+	}
       
       Tout->Fill();     
     }
@@ -828,6 +857,7 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   //illustrating proton and neutron spot cut regions
   c1->cd(1)->SetGrid();
+  h2_dxdyHCAL_cut->GetYaxis()->SetTitleOffset(1.3);
   h2_dxdyHCAL_cut->Draw("colz");
 
   TEllipse Ep;
@@ -838,73 +868,107 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   TEllipse En;
   En.SetFillStyle(0);
-  En.SetLineColor(6);
+  En.SetLineColor(1);
   En.SetLineWidth(4);
   En.DrawEllipse(dy0_n,dx0_n,1.5*dysigma_n,1.5*dxsigma_n,0,360,0);
   // ******
 
   //fiducial cut visualization
   c1->cd(3);
-  h2_xyHCAL_p_cut->Draw("colz");
+  h2_xyBB_p_exp->SetStats(0);
+  h2_xyBB_p_exp->GetYaxis()->SetTitleOffset(1.3);
+  h2_xyBB_p_exp->Draw("colz");
+  // h2_xyHCAL_p_cut->SetStats(0);
+  // h2_xyHCAL_p_cut->GetYaxis()->SetTitleOffset(1.3);
+  // h2_xyHCAL_p_cut->Draw("colz");
 
   TLine L1h_p;
   L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
-  L1h_p.DrawLine(-0.9,1.135,0.9,1.135);
+  L1h_p.DrawLine(-0.9,1.285,0.9,1.285);
   TLine L2h_p;
   L2h_p.SetLineColor(2); L2h_p.SetLineWidth(4); L2h_p.SetLineStyle(9);
-  L2h_p.DrawLine(-0.9,-1.865,0.9,-1.865);
+  L2h_p.DrawLine(-0.9,-2.015,0.9,-2.015);
   
   TLine L1v_p;
   L1v_p.SetLineColor(2); L1v_p.SetLineWidth(4); L1v_p.SetLineStyle(9);
-  L1v_p.DrawLine(-0.6,-2.165,-0.6,1.435);
+  L1v_p.DrawLine(-0.75,-2.165,-0.75,1.435);
   TLine L2v_p;
   L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
-  L2v_p.DrawLine(0.6,-2.165,0.6,1.435);
+  L2v_p.DrawLine(0.75,-2.165,0.75,1.435);
   
   c1->cd(4);
-  h2_xyHCAL_n_cut->Draw("colz");
+  h2_xyBB_n_exp->SetStats(0);
+  h2_xyBB_n_exp->GetYaxis()->SetTitleOffset(1.3);
+  h2_xyBB_n_exp->Draw("colz");
+  // h2_xyHCAL_n_cut->SetStats(0);
+  // h2_xyHCAL_n_cut->GetYaxis()->SetTitleOffset(1.3);
+  // h2_xyHCAL_n_cut->Draw("colz");
 
   TLine L1h_n;
   L1h_n.SetLineColor(2); L1h_n.SetLineWidth(4); L1h_n.SetLineStyle(9);
-  L1h_n.DrawLine(-0.9,1.135,0.9,1.135);
+  L1h_n.DrawLine(-0.9,1.285,0.9,1.285);
   TLine L2h_n;
   L2h_n.SetLineColor(2); L2h_n.SetLineWidth(4); L2h_n.SetLineStyle(9);
-  L2h_n.DrawLine(-0.9,-1.865,0.9,-1.865);
+  L2h_n.DrawLine(-0.9,-2.015,0.9,-2.015);
   
   TLine L1v_n;
   L1v_n.SetLineColor(2); L1v_n.SetLineWidth(4); L1v_n.SetLineStyle(9);
-  L1v_n.DrawLine(-0.6,-2.165,-0.6,1.435);
+  L1v_n.DrawLine(-0.75,-2.165,-0.75,1.435);
   TLine L2v_n;
   L2v_n.SetLineColor(2); L2v_n.SetLineWidth(4); L2v_n.SetLineStyle(9);
-  L2v_n.DrawLine(0.6,-2.165,0.6,1.435);
+  L2v_n.DrawLine(0.75,-2.165,0.75,1.435);
   // ******
 
   //fitting delta_x distribution
   c1->cd(2);
-  gStyle->SetOptFit(1111); 
+  gStyle->SetOptStat(0);
+  h_dxHCAL_cut->SetLineWidth(4); h_dxHCAL_cut->SetLineColor(1);
+
+  double bgF_par0, bgF_par1, bgF_par2;
+  double pF_low, pF_hi, pF_par0, pF_par1, pF_par2;
+  double nF_low, nF_hi, nF_par0, nF_par1, nF_par2;
+
+  if(SBSM30){
+    bgF_par0=480; bgF_par1=-0.3; bgF_par2=0.5;
+    pF_low=-1.13; pF_hi=-0.2; pF_par0=1967; pF_par1=-0.64; pF_par2=0.16;
+    nF_low=-0.2; nF_hi=0.41; nF_par0=662; nF_par1=0.005; nF_par2=0.184;
+  }else if(SBSM50){
+    bgF_par0=160; bgF_par1=-0.42; bgF_par2=0.7;
+    pF_low=-1.34; pF_hi=-0.74; pF_par0=406; pF_par1=-1.019; pF_par2=0.183;
+    nF_low=-0.2, nF_hi=0.32; nF_par0=142; nF_par1=0.071; nF_par2=0.171;
+  }
+    
   double par[9], par_f[9];
   TF1* bg_func = new TF1("bg_func", bg_fit, -2.5, 2.5, 3 );
-  bg_func->SetParameters(480,-0.3,0.5); //(160,-0.42,.7); 
+  //bg_func->SetParameters(480,-0.3,0.5); // SBS 30p
+  //bg_func->SetParameters(160,-0.42,.7);
+  bg_func->SetParameters(bgF_par0,bgF_par1,bgF_par2);
   bg_func->SetLineColor(2);
   reject_bg = true;
   h_dxHCAL_cut->Fit(bg_func,"NR");
   bg_func->GetParameters(&par[0]);
   reject_bg = false;
 
-  TF1* p_func = new TF1("p_func", "gaus", -1.13, -0.2 ); //-1.34, -.74); 
-  p_func->SetParameters(1967,-0.58,0.16); //(406,-1.019,0.1826); 
+  // TF1* p_func = new TF1("p_func", "gaus", -1.34, -.74);
+  //-1.13, -0.2 ); 
+  //p_func->SetParameters(406,-1.019,0.1826); //(1967,-0.58,0.16);
+  TF1* p_func = new TF1("p_func", "gaus", pF_low, pf_hi);
+  p_func->SetParameters(pF_par0,pF_par1,pF_par2);
   p_func->SetLineColor(3);
   h_dxHCAL_cut->Fit(p_func,"NR+");
   p_func->GetParameters(&par[3]);
 
-  TF1* n_func = new TF1("n_func", "gaus", -0.2, 0.41 ); //-.2, .32);
-  n_func->SetParameters(662,-0.047,0.184); //(142,.071,.171); 
+  // TF1* n_func = new TF1("n_func", "gaus", -.2, .32);
+  //-0.2, 0.41 ); 
+  //n_func->SetParameters(142,.071,.171); //(662,-0.047,0.184);
+  TF1* n_func = new TF1("n_func", "gaus", nF_low, nF_hi);
+  n_func->SetParameters(nF_par0,nF_par1,nF_par2);
   n_func->SetLineColor(4);
   h_dxHCAL_cut->Fit(n_func,"NR+");
   n_func->GetParameters(&par[6]);
 
   TF1* total = new TF1("total","gaus(0)+gaus(3)+gaus(6)",-2.5,2.5);
-  total->SetLineColor(1);
+  total->SetLineColor(2); total->SetLineWidth(4);
   total->SetParameters(par);
   h_dxHCAL_cut->Fit(total,"R+");
   total->GetParameters(par_f);
@@ -912,17 +976,28 @@ void hcal_dxdy_ld2( const char *configfilename,
   //visulaization and extraction of physics results
   double n_count, p_count;
   TF1 *backFcn = new TF1("backFcn","gaus",-2.5,2.5);
-  backFcn->SetLineColor(kRed);
+  backFcn->SetLineColor(6); backFcn->SetLineWidth(4);
   TF1 *pFcn = new TF1("pFcn","gaus",-2.5,2.5);
-  pFcn->SetLineColor(kGreen);
+  pFcn->SetLineColor(kBlue); pFcn->SetLineWidth(4);
   TF1 *nFcn = new TF1("nFcn","gaus",-2.5,2.5);
-  nFcn->SetLineColor(kBlue);
+  nFcn->SetLineColor(kGreen); nFcn->SetLineWidth(4);
 
   backFcn->SetParameters(&par_f[0]); backFcn->Draw("same");
   pFcn->SetParameters(&par_f[3]); pFcn->Draw("same");
   nFcn->SetParameters(&par_f[6]); nFcn->Draw("same");
   p_count = (int)pFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
   n_count = (int)nFcn->Integral(-2.5,2.5)/h_dxHCAL_cut->GetBinWidth(1);
+  
+  // draw the legend
+  TLegend *legend=new TLegend(0.48,0.66,0.90,0.85);
+  legend->SetTextFont(42);
+  //legend->SetTextSize(0.02);
+  legend->AddEntry(h_dxHCAL_cut,"Data","l");
+  legend->AddEntry(total,"Global Fit","l");
+  legend->AddEntry(pFcn,Form("p signal fit, #mu = %2.4f, #sigma = %2.4f",par_f[4],par_f[5]),"l");
+  legend->AddEntry(nFcn,Form("n signal fit, #mu = %2.4f, #sigma = %2.4f",par_f[7],par_f[8]),"l");
+  legend->AddEntry(backFcn,"Background fit","l");
+  legend->Draw();  
  
   cout << endl << "------" << endl;
   cout << " n count = " << n_count << endl;
