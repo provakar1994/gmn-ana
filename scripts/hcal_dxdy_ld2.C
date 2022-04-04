@@ -923,9 +923,9 @@ void hcal_dxdy_ld2( const char *configfilename,
 
   //fitting delta_x distribution
   c1->cd(2);
-  //gStyle->SetOptStat(0);
-  gStyle->SetOptFit(1111);
-  //h_dxHCAL_cut->SetLineWidth(4); h_dxHCAL_cut->SetLineColor(1);
+  gStyle->SetOptStat(0);
+  //gStyle->SetOptFit(1111);
+  h_dxHCAL_cut->SetLineWidth(2); h_dxHCAL_cut->SetLineColor(1);
 
   double bgF_par0, bgF_par1, bgF_par2;
   double pF_low, pF_hi, pF_par0, pF_par1, pF_par2;
@@ -993,7 +993,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   legend->AddEntry(pFcn,Form("p signal fit, #mu = %2.4f, #sigma = %2.4f",par_f[4],par_f[5]),"l");
   legend->AddEntry(nFcn,Form("n signal fit, #mu = %2.4f, #sigma = %2.4f",par_f[7],par_f[8]),"l");
   legend->AddEntry(backFcn,"Background fit","l");
-  //legend->Draw();  
+  legend->Draw();  
  
   cout << endl << "------" << endl;
   cout << " n count = " << n_count << endl;
