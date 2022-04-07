@@ -511,14 +511,14 @@ void hcal_dxdy_ld2( const char *configfilename,
   TH2D *h2_xyHCAL = new TH2D("h2_xyHCAL",";y_{HCAL} (m);x_{HCAL} (m)",12,-0.9,0.9,24,-2.165,1.435);
   TH2D *h2_xyHCAL_W_cut = new TH2D("h2_xyHCAL_W_cut",";y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","x_{HCAL} vs y_{HCAL} w/ W & p spot cut;y_{HCAL} (m);x_{HCAL} (m)"
+  TH2D *h2_xyHCAL_p_cut = new TH2D("h2_xyHCAL_p_cut","x_{HCAL} vs y_{HCAL} w/ W, p spot, & Fiducial cut;y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","x_{HCAL} vs y_{HCAL} w/ W & n spot cut;y_{HCAL} (m);x_{HCAL} (m)"
+  TH2D *h2_xyHCAL_n_cut = new TH2D("h2_xyHCAL_n_cut","x_{HCAL} vs y_{HCAL} w/ W, n spot, & Fiducial cut;y_{HCAL} (m);x_{HCAL} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
 
-  TH2D *h2_xyBB_p_exp = new TH2D("h2_xyBB_p_exp","x_{exp}-1.10 vs y_{exp} w/ W & n spot cut (exp. p pos.);y_{exp} (m);x_{exp}-1.10 (m)"
+  TH2D *h2_xyBB_p_exp = new TH2D("h2_xyBB_p_exp","x_{exp}-0.65 vs y_{exp} w/ W & Fiducial cut (exp. p pos.);y_{exp} (m);x_{exp}-0.65 (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
-  TH2D *h2_xyBB_n_exp = new TH2D("h2_xyBB_n_exp","x_{exp} vs y_{exp} w/ W & p spot cut (exp. n pos.);y_{exp} (m);x_{exp} (m)"
+  TH2D *h2_xyBB_n_exp = new TH2D("h2_xyBB_n_exp","x_{exp} vs y_{exp} w/ W & Fiducial cut (exp. n pos.);y_{exp} (m);x_{exp} (m)"
 				   ,12,-0.9,0.9,24,-2.165,1.435);
 
   TH2D *h2_W_vs_dxHCAL = new TH2D("h2_W_vs_dxHCAL","; x_{HCAL} - x_{exp} (m); W (GeV)", 250,-2.5,2.5,250,0,2);
@@ -806,15 +806,18 @@ void hcal_dxdy_ld2( const char *configfilename,
       }
       
       if( Wrecon >= Wmin && Wrecon <= Wmax && HCAL_active){
-	if( passed_n_cut && fidu_cut)
+	if(fidu_cut) 
 	  {
-	    h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
 	    h2_xyBB_p_exp->Fill(yexpect_HCAL,xexpect_HCAL-deltax_shift);  // xexpect_HCAL-0.65);
+	    h2_xyBB_n_exp->Fill(yexpect_HCAL,xexpect_HCAL);
 	  }
 	if( passed_p_cut && fidu_cut)
 	  {
 	    h2_xyHCAL_p_cut->Fill(yHCAL,xHCAL);
-	    h2_xyBB_n_exp->Fill(yexpect_HCAL,xexpect_HCAL);
+	  }
+	if( passed_n_cut && fidu_cut)
+	  {
+	    h2_xyHCAL_n_cut->Fill(yHCAL,xHCAL);
 	  }
       }
 
@@ -876,7 +879,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   // ******
 
   //fiducial cut visualization
-  c1->cd(3);
+  c1->cd(4);
   h2_xyBB_p_exp->SetStats(0);
   h2_xyBB_p_exp->GetYaxis()->SetTitleOffset(1.3);
   h2_xyBB_p_exp->Draw("colz");
@@ -884,6 +887,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   // h2_xyHCAL_p_cut->GetYaxis()->SetTitleOffset(1.3);
   // h2_xyHCAL_p_cut->Draw("colz");
 
+  //active area 
   TLine L1h_p;
   L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
   L1h_p.DrawLine(-0.9,1.285,0.9,1.285);
@@ -897,8 +901,23 @@ void hcal_dxdy_ld2( const char *configfilename,
   TLine L2v_p;
   L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
   L2v_p.DrawLine(0.75,-2.165,0.75,1.435);
+
+  //safety margin
+  TLine L1h_p_s;
+  L1h_p_s.SetLineColor(4); L1h_p_s.SetLineWidth(2); L1h_p_s.SetLineStyle(9);
+  L1h_p_s.DrawLine(-0.9,1.098,0.9,1.098);
+  TLine L2h_p_s;
+  L2h_p_s.SetLineColor(4); L2h_p_s.SetLineWidth(2); L2h_p_s.SetLineStyle(9);
+  L2h_p_s.DrawLine(-0.9,-1.84,0.9,-1.84);
   
-  c1->cd(4);
+  TLine L1v_p_s;
+  L1v_p_s.SetLineColor(4); L1v_p_s.SetLineWidth(2); L1v_p_s.SetLineStyle(9);
+  L1v_p_s.DrawLine(-0.49,-2.165,-0.49,1.435);
+  TLine L2v_p_s;
+  L2v_p_s.SetLineColor(4); L2v_p_s.SetLineWidth(2); L2v_p_s.SetLineStyle(9);
+  L2v_p_s.DrawLine(0.49,-2.165,0.49,1.435);
+  
+  c1->cd(3);
   h2_xyBB_n_exp->SetStats(0);
   h2_xyBB_n_exp->GetYaxis()->SetTitleOffset(1.3);
   h2_xyBB_n_exp->Draw("colz");
@@ -919,13 +938,28 @@ void hcal_dxdy_ld2( const char *configfilename,
   TLine L2v_n;
   L2v_n.SetLineColor(2); L2v_n.SetLineWidth(4); L2v_n.SetLineStyle(9);
   L2v_n.DrawLine(0.75,-2.165,0.75,1.435);
+
+  //safety margin
+  TLine L1h_n_s;
+  L1h_n_s.SetLineColor(4); L1h_n_s.SetLineWidth(2); L1h_n_s.SetLineStyle(9);
+  L1h_n_s.DrawLine(-0.9,1.098,0.9,1.098);
+  TLine L2h_n_s;
+  L2h_n_s.SetLineColor(4); L2h_n_s.SetLineWidth(2); L2h_n_s.SetLineStyle(9);
+  L2h_n_s.DrawLine(-0.9,-1.84,0.9,-1.84);
+  
+  TLine L1v_n_s;
+  L1v_n_s.SetLineColor(4); L1v_n_s.SetLineWidth(2); L1v_n_s.SetLineStyle(9);
+  L1v_n_s.DrawLine(-0.49,-2.165,-0.49,1.435);
+  TLine L2v_n_s;
+  L2v_n_s.SetLineColor(4); L2v_n_s.SetLineWidth(2); L2v_n_s.SetLineStyle(9);
+  L2v_n_s.DrawLine(0.49,-2.165,0.49,1.435);  
   // ******
 
   //fitting delta_x distribution
   c1->cd(2);
   gStyle->SetOptStat(0);
   //gStyle->SetOptFit(1111);
-  h_dxHCAL_cut->SetLineWidth(2); h_dxHCAL_cut->SetLineColor(1);
+  h_dxHCAL_cut->SetLineWidth(4); h_dxHCAL_cut->SetLineColor(1);
 
   double bgF_par0, bgF_par1, bgF_par2;
   double pF_low, pF_hi, pF_par0, pF_par1, pF_par2;
@@ -964,7 +998,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   n_func->GetParameters(&par[6]);
 
   TF1* total = new TF1("total","gaus(0)+gaus(3)+gaus(6)",-2.5,2.5);
-  total->SetLineColor(2); total->SetLineWidth(2);
+  total->SetLineColor(2); total->SetLineWidth(4);
   total->SetParameters(par);
   h_dxHCAL_cut->Fit(total,"R+");
   total->GetParameters(par_f);
@@ -972,11 +1006,11 @@ void hcal_dxdy_ld2( const char *configfilename,
   //visulaization and extraction of physics results
   double n_count, p_count;
   TF1 *backFcn = new TF1("backFcn","gaus",-2.5,2.5);
-  backFcn->SetLineColor(6); backFcn->SetLineWidth(1);
+  backFcn->SetLineColor(6); backFcn->SetLineWidth(4);
   TF1 *pFcn = new TF1("pFcn","gaus",-2.5,2.5);
-  pFcn->SetLineColor(kBlue); pFcn->SetLineWidth(1);
+  pFcn->SetLineColor(kBlue); pFcn->SetLineWidth(4);
   TF1 *nFcn = new TF1("nFcn","gaus",-2.5,2.5);
-  nFcn->SetLineColor(kGreen); nFcn->SetLineWidth(1);
+  nFcn->SetLineColor(kGreen); nFcn->SetLineWidth(4);
 
   backFcn->SetParameters(&par_f[0]); backFcn->Draw("same");
   pFcn->SetParameters(&par_f[3]); pFcn->Draw("same");
