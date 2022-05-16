@@ -33,6 +33,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "Math/Vector3D.h"
+#include "Math/Vector4D.h"
+
 double PI = TMath::Pi();
 
 double Mp = 0.938272;
@@ -104,10 +107,15 @@ void hcal_dxdy_ld2( const char *configfilename,
   double ebeam=1.916;
   double bbtheta = 51.0*TMath::DegToRad();
   double sbstheta = 34.5*TMath::DegToRad();
-  double hcaldist = 13.5; //meters
+  double sbsdist = 2.25; //m
+  double hcaldist = 13.5; //m
   double Ltgt = 15.0; //cm
   double rho_tgt = 0.0723; //g/cc
   double rho_Al = 2.7; //g/cc
+
+  double dipGap = 1.22; //m
+  double sbsfield_frac = 1.;
+  double sbsmaxfield = 3.1 * atan( 0.85/(11.0 - 2.25 - dipGap/2.0 ))/0.3/dipGap/0.7;
   
   double celldiameter = 1.6*2.54; //cm, right now this is a guess
 
@@ -211,6 +219,26 @@ void hcal_dxdy_ld2( const char *configfilename,
 	if( skey == "sbstheta" ){ //SBS/HCAL central angle (deg) (assumed to be on beam right)
 	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
 	  sbstheta = stemp.Atof() * TMath::DegToRad();
+	}
+	
+	if( skey == "sbsmaxfield" ){ //100% 48D48 field: 1.5T.m/1.22m = 1.23T 
+	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
+	  sbsmaxfield = stemp.Atof();
+	}
+
+	if( skey == "sbsfield_frac" ){ //fraction of 100% 48D48 field 
+	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
+	  sbsfield_frac = stemp.Atof();
+	}
+
+	if( skey == "dipGap" ){ //internal gap in 48D48 (m)
+	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
+	  dipGap = stemp.Atof();
+	}
+	
+	if( skey == "sbsdist" ){ //48D48 magnet distance from target (m)
+	  TString stemp = ( (TObjString*) (*tokens)[1] )->GetString();
+	  sbsdist = stemp.Atof();
 	}
 
 	if( skey == "hcaldist" ){ //HCAL distance from target (m)
@@ -350,7 +378,8 @@ void hcal_dxdy_ld2( const char *configfilename,
   }
 
   if(SBSM==30)
-    outputfilename = "sbs4_sbs30p_ld2.root";
+    // outputfilename = "sbs4_sbs30p_ld2.root";
+    outputfilename = "test.root";
   if(SBSM==50)
     outputfilename = "sbs4_sbs50p_ld2.root";
   
@@ -548,6 +577,7 @@ void hcal_dxdy_ld2( const char *configfilename,
   
   TTree *Tout = new TTree("Tout","Tree containing variables for momentum calibration");
   double T_ebeam, T_etheta, T_ephi, T_precon, T_pelastic, T_thetabend, T_dpel, T_W2;
+  double T_thetapq_n, T_thetapq_p;
   double T_pincident;
   double T_xfp, T_yfp, T_thfp, T_phfp;
   double T_thtgt, T_phtgt, T_ytgt, T_xtgt;
@@ -594,6 +624,8 @@ void hcal_dxdy_ld2( const char *configfilename,
   Tout->Branch( "EHCAL", &T_EHCAL, "EHCAL/D");
   Tout->Branch( "deltax", &T_deltax, "deltax/D");
   Tout->Branch( "deltay", &T_deltay, "deltay/D");
+  Tout->Branch( "thetapq_n", &T_thetapq_n, "thetapq_n/D");
+  Tout->Branch( "thetapq_p", &T_thetapq_p, "thetapq_p/D");
   Tout->Branch( "pp_expect", &T_pp_expect, "pp_expect/D");
   Tout->Branch( "ptheta_expect", &T_ptheta_expect, "ptheta_expect/D");
   Tout->Branch( "pphi_expect", &T_pphi_expect, "pphi_expect/D");
@@ -700,24 +732,43 @@ void hcal_dxdy_ld2( const char *configfilename,
       TLorentzVector Ptarg(0,0,0,Mp);
       TLorentzVector q = Pbeam - Kprime;
 
+      // Let's try using TLorentzVector
+      TLorentzVector Pnprime = q + Ptarg;
+
+      // Calculation of theta_pq for elastic, expected to be 0
+      TVector3 q_3v = q.Vect();
+      TVector3 Pnprime_3v = Pnprime.Vect();
+      double thetapq_elastic = acos(( Pnprime_3v.Mag()*q_3v.Mag() )/Pnprime_3v.Dot(q_3v));
+      // T_thetapq = theta_pq; //57.29578*theta_pq;
+      // ****
+
       // Usually when we are running this code, the angle reconstruction is already well calibrated, but the momentum reconstruction is
       // unreliable; use pel(theta) as electron momentum for kinematic correlation:
+      // Model 0 = uses reconstructed p as independent variable
+      // model 1 = uses reconstructed angles as independent variable
+      // model 2 = same as model 1 but uses TLorentzVector for the calculation of pp_expect
       double nu;
       if(model==0)
 	nu = Ebeam_corrected - p[0];
       else if(model==1)
 	nu = Ebeam_corrected - pelastic;
+      else if(model==2)
+	nu = q.E();
       
       double pp_expect = sqrt(pow(nu,2)+2.*Mp*nu); //sqrt(nu^2 + Q^2) = sqrt(nu^2 + 2Mnu)
+      if(model==2) pp_expect = Pnprime.P();
+      
       double pphi_expect = ephi + PI;
       T_pp_expect = pp_expect;
       T_pphi_expect = pphi_expect;
       
       double ptheta_expect;
       if(model==0)
-	ptheta_expect = acos( (Ebeam_corrected-pz[0])/pp_expect ); //will this give better resolution than methods based on electron angle only? Not entirely clear
-      else if(model==1)
-	ptheta_expect = acos( (Ebeam_corrected-pelastic*cos(etheta))/pp_expect ); //will this give better resolution than methods based on electron angle only? Not entirely clear
+	//will this give better resolution than methods based on electron angle only? Not entirely clear
+	ptheta_expect = acos( (Ebeam_corrected-pz[0])/pp_expect ); 
+      else if(model==1 || model==2)
+	ptheta_expect = acos( (Ebeam_corrected-pelastic*cos(etheta))/pp_expect );
+      
       T_ptheta_expect = ptheta_expect;
       
       TVector3 pNhat( sin(ptheta_expect)*cos(pphi_expect), sin(ptheta_expect)*sin(pphi_expect), cos(ptheta_expect) );
@@ -737,6 +788,18 @@ void hcal_dxdy_ld2( const char *configfilename,
       h_dyHCAL->Fill( yHCAL - yexpect_HCAL );
       h2_dxdyHCAL->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
       h2_xyHCAL->Fill(yHCAL,xHCAL);
+
+      // Calculation of thetapq for n using HCAL information for QE scattering
+      TVector3 HCAL_pos = HCAL_origin + xHCAL*HCAL_xaxis + yHCAL*HCAL_yaxis;
+      TVector3 n_dir = ( HCAL_pos - vertex ).Unit();
+      T_thetapq_n = acos( n_dir.Dot(q_3v.Unit()) );
+
+      // For p theta_pq calculation we need to estimate the deflection
+      double BdL = sbsfield_frac*sbsmaxfield*dipGap;
+      double proton_thetabend = 0.3*BdL/q_3v.Mag();
+      double proton_deflection = tan(proton_thetabend)*( hcaldist - (sbsdist + dipGap/2.0) );
+      TVector3 p_dir = ( HCAL_pos + proton_deflection*HCAL_xaxis - vertex ).Unit();
+      T_thetapq_p = acos( p_dir.Dot(q_3v.Unit()) );
 
       h2_W_vs_dxHCAL->Fill( xHCAL - xexpect_HCAL, Wrecon );
 
