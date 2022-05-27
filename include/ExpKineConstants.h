@@ -3,12 +3,16 @@
 
 namespace expconst {
 
-  double ebeam(int config);
-  double bbtheta(int config);
-  double bbdist(int config);
-  double sbstheta(int config);
-  double sbsdist(int config);
-  double hcaldist(int config);
+  // Constant for the entire experiment
+  double dipolegap = 1.22;  //m
+
+  // Following quantities vary with configuration
+  double ebeam(int config);  //GeV
+  double bbtheta(int config);  //deg
+  double bbdist(int config);  //m
+  double sbstheta(int config);  //deg
+  double sbsdist(int config);  //m
+  double hcaldist(int config);  //m
   
 }
 
