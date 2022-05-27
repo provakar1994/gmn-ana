@@ -1,4 +1,4 @@
-#include "../include/ExpKineConstants.h"
+#include "../include/ExpConstants.h"
 
 namespace expconst {
 
