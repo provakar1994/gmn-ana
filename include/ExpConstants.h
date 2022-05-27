@@ -12,7 +12,17 @@ namespace expconst {
   static const int hcalrow = 24;
   
   // Constant for the entire experiment
+  // target
+  static const double tarlen = 15.0;  //cm
+  static const double tarrho = 0.0723;  //g/cc
+  //// LH2
+  static const double lh2cthick = 0.02; //cm
+  static const double lh2uwallthick = 0.0145; //cm
+  static const double lh2dwallthick = 0.015;  //cm
+  // magnet
   static const double dipolegap = 1.22;  //m
+  // shieldling
+  static const double Alrho = 2.7; //g/cc
 
   // Following quantities vary with configuration
   double ebeam(int config);  //GeV
