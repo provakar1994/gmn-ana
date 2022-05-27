@@ -7,7 +7,7 @@ namespace kine {
   }
 
   double W2(double ebeam, double eeprime, double Q2){
-    return pow(constant::Mp,2.0)+2.0 + constant::Mp*(ebeam-eeprime) - Q2;
+    return pow(constant::Mp,2.0) + 2.0*constant::Mp*(ebeam-eeprime) - Q2;
   }
 
   double W(double ebeam, double eeprime, double Q2){
