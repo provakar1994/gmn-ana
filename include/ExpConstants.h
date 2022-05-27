@@ -3,8 +3,16 @@
 
 namespace expconst {
 
+  // Detector variables
+  static const int shcol = 7;
+  static const int shrow = 27;
+  static const int pscol = 2;
+  static const int psrow = 26;
+  static const int hcalcol = 12;
+  static const int hcalrow = 24;
+  
   // Constant for the entire experiment
-  double dipolegap = 1.22;  //m
+  static const double dipolegap = 1.22;  //m
 
   // Following quantities vary with configuration
   double ebeam(int config);  //GeV
