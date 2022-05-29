@@ -19,7 +19,7 @@ namespace setrootvar {
 		 std::vector<void*> memory)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "Contaier size of branch suffix != Container size of branch memory" std::endl;
+      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     std::string branchname;
@@ -37,7 +37,7 @@ namespace setrootvar {
   		 int ndatavarpos)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "Contaier size of branch suffix != Container size of branch memory" std::endl;
+      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     std::string branchname;
@@ -61,7 +61,7 @@ namespace setrootvar {
   		 std::vector<int> ndatapos)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "Contaier size of branch suffix != Container size of branch memory" std::endl;
+      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     std::string branchname;
