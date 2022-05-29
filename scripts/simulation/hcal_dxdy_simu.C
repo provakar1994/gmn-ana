@@ -32,9 +32,12 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <TStopwatch.h>
 
 #include "Math/Vector3D.h"
 #include "Math/Vector4D.h"
+
+#include "../../src/SetROOTVar.cpp"
 
 double PI = TMath::Pi();
 
@@ -73,6 +76,9 @@ void hcal_dxdy_simu( const char *configfilename,
 		    const char *outputfilename="hcal_dxdy_ld2.root" )
 {
   
+  TStopwatch *sw = new TStopwatch();
+  sw->Start();
+
   ifstream configfile(configfilename);
 
   //so as usual the main things to define are:
@@ -378,7 +384,8 @@ void hcal_dxdy_simu( const char *configfilename,
   }
 
   if(SBSM==30)
-    outputfilename = "test_dig_sbs4_30p_ld2.root";
+    //outputfilename = "test_dig_sbs4_30p_ld2.root";
+    outputfilename = "test.root";
   if(SBSM==50)
     outputfilename = "test_dig_sbs4_50p_ld2.root";
   
@@ -408,102 +415,46 @@ void hcal_dxdy_simu( const char *configfilename,
   C->Draw(">>elist",globalcut);
 
   int MAXNTRACKS=1000;
-
-  //Declare variables to hold branch addresses:  
-  double ntrack;
-  double px[MAXNTRACKS], py[MAXNTRACKS], pz[MAXNTRACKS], p[MAXNTRACKS];
-  double vx[MAXNTRACKS], vy[MAXNTRACKS], vz[MAXNTRACKS];
-
-  //Use "rotated" versions of the focal plane variables:
-  double xfp[MAXNTRACKS], yfp[MAXNTRACKS], thfp[MAXNTRACKS], phfp[MAXNTRACKS];
-  //Also need target variables:
-  double xtgt[MAXNTRACKS], ytgt[MAXNTRACKS], thtgt[MAXNTRACKS], phtgt[MAXNTRACKS];
-  
-  double xHCAL, yHCAL, EHCAL;
-  double EPS, ESH, xSH, ySH, xPS;
-
-  int tdcElemN;
-  double tdcTrig[MAXNTRACKS], tdcElem[MAXNTRACKS];
-
-  //Ignore hodo variables for meow:
-  // int maxHODOclusters=100;
-  // double nHODOclusters; 
-  // double xHODO[maxHODOclusters],yHODO[maxHODOclusters];
-  // double tmeanHODO[maxHODOclusters], tdiffHODO[maxHODOclusters];
-  
   C->SetBranchStatus("*",0);
-  //Minimal set of HCAL variables:
-  C->SetBranchStatus("sbs.hcal.x",1);
-  C->SetBranchStatus("sbs.hcal.y",1);
-  C->SetBranchStatus("sbs.hcal.e",1);
+  //bbsh clus var
+  double ESH, xSH, ySH;
+  std::vector<std::string> shclvar = {"e","x","y"};
+  std::vector<void*> shclvar_mem = {&ESH,&xSH,&ySH};
+  setrootvar::setbranch(C,"bb.sh",shclvar,shclvar_mem);
 
-  //BigBite track variables:
-  C->SetBranchStatus("bb.tr.n",1);
-  C->SetBranchStatus("bb.tr.px",1);
-  C->SetBranchStatus("bb.tr.py",1);
-  C->SetBranchStatus("bb.tr.pz",1);
-  C->SetBranchStatus("bb.tr.p",1);
-  C->SetBranchStatus("bb.tr.vx",1);
-  C->SetBranchStatus("bb.tr.vy",1);
-  C->SetBranchStatus("bb.tr.vz",1);
+  //bbps clus var
+  double EPS, xPS, yPS;
+  std::vector<std::string> psclvar = {"e","x","y"};
+  std::vector<void*> psclvar_mem = {&EPS,&xPS,&yPS};
+  setrootvar::setbranch(C,"bb.ps",psclvar,psclvar_mem);
+
+  //hcal clus var
+  double EHCAL, xHCAL, yHCAL;
+  std::vector<std::string> hcalclvar = {"e","x","y"};
+  std::vector<void*> hcalclvar_mem = {&EHCAL,&xHCAL,&yHCAL};
+  setrootvar::setbranch(C,"sbs.hcal",hcalclvar,hcalclvar_mem);
+
+  //track var
+  double ntrack, p[MAXNTRACKS],px[MAXNTRACKS],py[MAXNTRACKS],pz[MAXNTRACKS];
+  double vx[MAXNTRACKS],vy[MAXNTRACKS],vz[MAXNTRACKS];
+  double xfp[MAXNTRACKS],yfp[MAXNTRACKS],thfp[MAXNTRACKS],phfp[MAXNTRACKS];
+  double xtgt[MAXNTRACKS],ytgt[MAXNTRACKS],thtgt[MAXNTRACKS],phtgt[MAXNTRACKS];
+  std::vector<std::string> trvar = {"n","p","px","py","pz",
+  				    "vx","vy","vz",
+  				    "r_x","r_y","r_th","r_ph",
+  				    "tg_x","tg_y","tg_th","tg_ph"};
+  std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,
+  				  &vx,&vy,&vz,&xfp,&yfp,&thfp,&phfp,
+  				  &xtgt,&ytgt,&thtgt,&phtgt};
+  setrootvar::setbranch(C,"bb.tr",trvar,trvar_mem);
+
+  //tdctrig variable
+  // int tdcElemN;
+  // double tdcTrig[MAXNTRACKS], tdcElem[MAXNTRACKS];
+  // std::vector<std::string> tdcvar = {"tdcelemID","tdcelemID","tdc"};
+  // std::vector<void*> tdcvar_mem = {&tdcElem,&tdcElemN,&tdcTrig};
+  // setrootvar::setbranch(C,"bb.tdctrig",tdcvar,tdcvar_mem,1);
   
-  C->SetBranchStatus("bb.tr.r_x",1);
-  C->SetBranchStatus("bb.tr.r_y",1);
-  C->SetBranchStatus("bb.tr.r_th",1);
-  C->SetBranchStatus("bb.tr.r_ph",1);
-  
-  C->SetBranchStatus("bb.tr.tg_x",1);
-  C->SetBranchStatus("bb.tr.tg_y",1);
-  C->SetBranchStatus("bb.tr.tg_th",1);
-  C->SetBranchStatus("bb.tr.tg_ph",1);
-  
-  //Shower and preshower variables:
-  C->SetBranchStatus("bb.ps.e",1);
-  C->SetBranchStatus("bb.ps.x",1);
-  C->SetBranchStatus("bb.ps.y",1);
-  C->SetBranchStatus("bb.sh.e",1);
-  C->SetBranchStatus("bb.sh.x",1);
-  C->SetBranchStatus("bb.sh.y",1);
-
-  //trigger TDC variables
-  C->SetBranchStatus("Ndata.bb.tdctrig.tdcelemID",1);
-  C->SetBranchStatus("bb.tdctrig.tdcelemID",1);
-  C->SetBranchStatus("bb.tdctrig.tdc",1);
-
-  C->SetBranchAddress("bb.tr.n",&ntrack);
-  C->SetBranchAddress("bb.tr.p",p);
-  C->SetBranchAddress("bb.tr.px",px);
-  C->SetBranchAddress("bb.tr.py",py);
-  C->SetBranchAddress("bb.tr.pz",pz);
-  C->SetBranchAddress("bb.tr.vx",vx);
-  C->SetBranchAddress("bb.tr.vy",vy);
-  C->SetBranchAddress("bb.tr.vz",vz);
-
-  //Focal-plane track variables (use "rotated" versions):
-  C->SetBranchAddress("bb.tr.r_x",xfp);
-  C->SetBranchAddress("bb.tr.r_y",yfp);
-  C->SetBranchAddress("bb.tr.r_th",thfp);
-  C->SetBranchAddress("bb.tr.r_ph",phfp);
-
-  //Target track variables (other than momentum):
-  C->SetBranchAddress("bb.tr.tg_x",xtgt);
-  C->SetBranchAddress("bb.tr.tg_y",ytgt);
-  C->SetBranchAddress("bb.tr.tg_th",thtgt);
-  C->SetBranchAddress("bb.tr.tg_ph",phtgt);
-
-  C->SetBranchAddress("sbs.hcal.x",&xHCAL);
-  C->SetBranchAddress("sbs.hcal.y",&yHCAL);
-  C->SetBranchAddress("sbs.hcal.e",&EHCAL);
-
-  C->SetBranchAddress("bb.ps.e",&EPS);
-  C->SetBranchAddress("bb.sh.e",&ESH);
-  C->SetBranchAddress("bb.ps.x",&xPS);
-  C->SetBranchAddress("bb.sh.x",&xSH);
-  C->SetBranchAddress("bb.sh.y",&ySH);
-
-  C->SetBranchAddress("Ndata.bb.tdctrig.tdcelemID",&tdcElemN);
-  C->SetBranchAddress("bb.tdctrig.tdcelemID",&tdcElem);
-  C->SetBranchAddress("bb.tdctrig.tdc",tdcTrig);  
 
   double pcentral = ebeam/(1.+ebeam/Mp*(1.-cos(bbtheta)));
 
@@ -682,13 +633,13 @@ void hcal_dxdy_simu( const char *configfilename,
       // *----
 
       //coincidence time analysis
-      double bbcal_time=0., hcal_time=0.;
-      for(int ihit=0; ihit<tdcElemN; ihit++){
-	if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
-	if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
-      }
-      double coin_time = hcal_time-bbcal_time;
-      h_coin_time->Fill( coin_time );
+      // double bbcal_time=0., hcal_time=0.;
+      // for(int ihit=0; ihit<tdcElemN; ihit++){
+      // 	if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
+      // 	if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
+      // }
+      // double coin_time = hcal_time-bbcal_time;
+      // h_coin_time->Fill( coin_time );
 
       //if( fabs(coin_time-510.)>10. ) continue;
       
@@ -1121,5 +1072,8 @@ void hcal_dxdy_simu( const char *configfilename,
   
   elist->Delete();
   //fout->Delete();
+
+  sw->Stop();
+  cout << "CPU time " << sw->CpuTime() << endl;
 
 }
