@@ -20,7 +20,7 @@ namespace expconst {
       return -1;
     }
   }
-
+  //--------------------------------------------
   double bbtheta(int config){
     if(config==1)
       return 51.0;
@@ -41,7 +41,7 @@ namespace expconst {
       return -1;
     }
   }
-
+  //--------------------------------------------
   double bbdist(int config){
     if(config==1)
       return 1.8518;
@@ -62,7 +62,7 @@ namespace expconst {
       return -1;
     }
   }
-
+  //--------------------------------------------
   double sbstheta(int config){
     if(config==1)
       return 33.5;
@@ -83,7 +83,7 @@ namespace expconst {
       return -1;
     }
   }
-
+  //--------------------------------------------
   double sbsdist(int config){
     if(config==1||config==4||config==7||config==11
        ||config==14||config==8||config==9)
@@ -93,7 +93,7 @@ namespace expconst {
       return -1;
     }
   }
-
+  //--------------------------------------------
   double hcaldist(int config){
     if(config==1)
       return 13.5;
@@ -108,6 +108,7 @@ namespace expconst {
       return -1;
     }
   }
+  //--------------------------------------------
 
 } //::expconst
 

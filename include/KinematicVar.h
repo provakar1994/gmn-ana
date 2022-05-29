@@ -1,6 +1,7 @@
 #ifndef KINE_VAR_H
 #define KINE_VAR_H
 
+#include <cmath>
 #include "../include/Constants.h"
 
 namespace kine{
