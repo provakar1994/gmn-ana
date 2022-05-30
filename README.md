@@ -1,2 +1,2 @@
 # gmn-ana
-SBS GMn analysis scripts
+SBS GMn analysis framework.
