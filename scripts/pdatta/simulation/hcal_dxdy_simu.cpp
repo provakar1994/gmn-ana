@@ -419,7 +419,7 @@ void hcal_dxdy_simu( const char *configfilename,
   //bbsh clus var
   double ESH, xSH, ySH;
   std::vector<std::string> shclvar = {"e","x","y"};
-  std::vector<void*> shclvar_mem = {&ESH,&xSH,&ySH,&rblkSH};
+  std::vector<void*> shclvar_mem = {&ESH,&xSH,&ySH};
   setrootvar::setbranch(C,"bb.sh",shclvar,shclvar_mem);
 
   //bbps clus var
