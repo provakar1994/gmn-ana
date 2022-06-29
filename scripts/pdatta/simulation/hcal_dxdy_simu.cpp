@@ -414,7 +414,7 @@ void hcal_dxdy_simu( const char *configfilename,
   cout << endl << "Creating a list of events that passed globalcut.." << endl;
   C->Draw(">>elist",globalcut);
 
-  int MAXNTRACKS=1000;
+  int maxNtr=1000;
   C->SetBranchStatus("*",0);
   //bbsh clus var
   double ESH, xSH, ySH;
@@ -435,21 +435,21 @@ void hcal_dxdy_simu( const char *configfilename,
   setrootvar::setbranch(C,"sbs.hcal",hcalclvar,hcalclvar_mem);
 
   //track var
-  double ntrack, p[MAXNTRACKS],px[MAXNTRACKS],py[MAXNTRACKS],pz[MAXNTRACKS];
-  double vx[MAXNTRACKS],vy[MAXNTRACKS],vz[MAXNTRACKS];
-  double xfp[MAXNTRACKS],yfp[MAXNTRACKS],thfp[MAXNTRACKS],phfp[MAXNTRACKS];
-  double xtgt[MAXNTRACKS],ytgt[MAXNTRACKS],thtgt[MAXNTRACKS],phtgt[MAXNTRACKS];
+  double ntrack, p[maxNtr],px[maxNtr],py[maxNtr],pz[maxNtr];
+  double vx[maxNtr],vy[maxNtr],vz[maxNtr];
+  double xfp[maxNtr],yfp[maxNtr],thfp[maxNtr],phfp[maxNtr];
+  double xtgt[maxNtr],ytgt[maxNtr],thtgt[maxNtr],phtgt[maxNtr];
   std::vector<std::string> trvar = {"n","p","px","py","pz","vx","vy","vz",
   				    "r_x","r_y","r_th","r_ph",
   				    "tg_x","tg_y","tg_th","tg_ph"};
-  std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,
-  				  &vx,&vy,&vz,&xfp,&yfp,&thfp,&phfp,
+  std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,&vx,&vy,&vz,
+				  &xfp,&yfp,&thfp,&phfp,
   				  &xtgt,&ytgt,&thtgt,&phtgt};
   setrootvar::setbranch(C,"bb.tr",trvar,trvar_mem);
 
   //tdctrig variable
   // int tdcElemN;
-  // double tdcTrig[MAXNTRACKS], tdcElem[MAXNTRACKS];
+  // double tdcTrig[maxNtr], tdcElem[maxNtr];
   // std::vector<std::string> tdcvar = {"tdcelemID","tdcelemID","tdc"};
   // std::vector<void*> tdcvar_mem = {&tdcElem,&tdcElemN,&tdcTrig};
   // setrootvar::setbranch(C,"bb.tdctrig",tdcvar,tdcvar_mem,1);
