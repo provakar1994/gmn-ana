@@ -387,7 +387,7 @@ void hcal_dxdy_simu( const char *configfilename,
     //outputfilename = "test_dig_sbs4_30p_ld2.root";
     outputfilename = "test.root";
   if(SBSM==50)
-    outputfilename = "test_dig_sbs4_50p_ld2.root";
+    outputfilename = "simu_sbs4_50p_ld2_imac.root";
   
   
   //Note that both of these calculations neglect the Aluminum end windows and cell walls:
@@ -439,8 +439,7 @@ void hcal_dxdy_simu( const char *configfilename,
   double vx[MAXNTRACKS],vy[MAXNTRACKS],vz[MAXNTRACKS];
   double xfp[MAXNTRACKS],yfp[MAXNTRACKS],thfp[MAXNTRACKS],phfp[MAXNTRACKS];
   double xtgt[MAXNTRACKS],ytgt[MAXNTRACKS],thtgt[MAXNTRACKS],phtgt[MAXNTRACKS];
-  std::vector<std::string> trvar = {"n","p","px","py","pz",
-  				    "vx","vy","vz",
+  std::vector<std::string> trvar = {"n","p","px","py","pz","vx","vy","vz",
   				    "r_x","r_y","r_th","r_ph",
   				    "tg_x","tg_y","tg_th","tg_ph"};
   std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,
