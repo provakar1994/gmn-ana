@@ -604,8 +604,8 @@ void hcal_dxdy_simu( const char *configfilename,
 
       // Calculating weight
       double ngen_total = 100000; //shouldn't be hard-coded
-      double I_beam = 1.0; //uA, shouldn't be hard-coded
-      double lumi = I_beam/(constant::qe*expconst::tarlen*expconst::ld2tarrho*(constant::N_A/constant::D2_Amass));
+      double I_beam = 1.0E-6; //A, shouldn't be hard-coded
+      double lumi = ((I_beam/constant::qe)*expconst::tarlen*expconst::ld2tarrho*(constant::N_A/constant::D2_Amass));
       double weight = mc_sigma*mc_omega*lumi/ngen_total;
 
       // * ----
