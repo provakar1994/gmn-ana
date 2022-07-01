@@ -37,7 +37,9 @@
 #include "Math/Vector3D.h"
 #include "Math/Vector4D.h"
 
-#include "../../src/SetROOTVar.cpp"
+#include "../../../include/Constants.h"
+#include "../../../src/SetROOTVar.cpp"
+#include "../../../src/ExpConstants.cpp"
 
 double PI = TMath::Pi();
 
@@ -53,7 +55,7 @@ double bg_fit(double *x, double *par){
     TF1::RejectPoint();
     return 0;
   }
-  if (SBSM==50 && reject_bg && x[0]>-1.77 && x[0]<0.51){ //x[0]>-1.65 && x[0]<0.556) {  
+  if (SBSM==50 && reject_bg && x[0]>-1.658 && x[0]<0.30){ //x[0]>-1.65 && x[0]<0.556) {  
     TF1::RejectPoint();
     return 0;
   }
@@ -453,7 +455,12 @@ void hcal_dxdy_simu( const char *configfilename,
   // std::vector<std::string> tdcvar = {"tdcelemID","tdcelemID","tdc"};
   // std::vector<void*> tdcvar_mem = {&tdcElem,&tdcElemN,&tdcTrig};
   // setrootvar::setbranch(C,"bb.tdctrig",tdcvar,tdcvar_mem,1);
-  
+
+  //MC variables
+  double mc_sigma, mc_omega;
+  std::vector<std::string> mc = {"mc_sigma","mc_omega"};
+  std::vector<void*> mc_mem = {&mc_sigma,&mc_omega};
+  setrootvar::setbranch(C,"MC",mc,mc_mem);
 
   double pcentral = ebeam/(1.+ebeam/Mp*(1.-cos(bbtheta)));
 
@@ -594,6 +601,12 @@ void hcal_dxdy_simu( const char *configfilename,
     cout.flush();
 
     if( int(ntrack) == 1 ){
+
+      // Calculating weight
+      double ngen_total = 100000; //shouldn't be hard-coded
+      double I_beam = 1.0; //uA, shouldn't be hard-coded
+      double lumi = I_beam/(constant::qe*expconst::tarlen*expconst::ld2tarrho*(constant::N_A/constant::D2_Amass));
+      double weight = mc_sigma*mc_omega*lumi/ngen_total;
 
       // * ----
       T_xfp = xfp[0];
@@ -758,7 +771,7 @@ void hcal_dxdy_simu( const char *configfilename,
       if( Wrecon >= Wmin && Wrecon <= Wmax ){
 	//h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
 	h_dyHCAL_cut->Fill( yHCAL - yexpect_HCAL );
-	h2_dxdyHCAL_cut->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL );
+	h2_dxdyHCAL_cut->Fill( yHCAL - yexpect_HCAL, xHCAL - xexpect_HCAL, weight );
 	h2_xyHCAL_W_cut->Fill(yHCAL,xHCAL);
       }
 
@@ -838,7 +851,7 @@ void hcal_dxdy_simu( const char *configfilename,
 
       if( Wrecon >= Wmin && Wrecon <= Wmax && fidu_cut && HCAL_active)
 	{
-	  h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL );
+	  h_dxHCAL_cut->Fill( xHCAL - xexpect_HCAL, weight );
 	}
 
       //filling W distributions for n and p
@@ -986,9 +999,9 @@ void hcal_dxdy_simu( const char *configfilename,
     pF_low=-1.13; pF_hi=-0.2; pF_par0=1967; pF_par1=-0.58; pF_par2=0.16;
     nF_low=-0.2; nF_hi=0.41; nF_par0=662; nF_par1=-0.047; nF_par2=0.184;
   }else if(SBSM==50){
-    bgF_par0=160; bgF_par1=-0.42; bgF_par2=0.7;
-    pF_low=-1.4; pF_hi=-0.78; pF_par0=475; pF_par1=-1.09; pF_par2=0.184;
-    nF_low=-0.22, nF_hi=0.26; nF_par0=182; nF_par1=0.009; nF_par2=0.169;
+    bgF_par0=0.2E-42; bgF_par1=-0.69; bgF_par2=0.61;
+    pF_low=-1.65; pF_hi=-0.69; pF_par0=1.2E-42; pF_par1=-1.15; pF_par2=0.199;
+    nF_low=-0.36, nF_hi=0.34; nF_par0=5E-43; nF_par1=0.00388; nF_par2=0.185;
   }
     
   double par[9], par_f[9];
@@ -996,7 +1009,7 @@ void hcal_dxdy_simu( const char *configfilename,
   bg_func->SetParameters(bgF_par0,bgF_par1,bgF_par2);
   bg_func->SetLineColor(2);
   reject_bg = true;
-  h_dxHCAL_cut->Fit(bg_func,"NR");
+  h_dxHCAL_cut->Fit(bg_func,"NR+");
   bg_func->GetParameters(&par[0]);
   reject_bg = false;
 
