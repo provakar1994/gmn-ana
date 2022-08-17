@@ -1,8 +1,7 @@
 /* 
-   This macro plots proton and neutron spots on HCal and
-   helps determining the QE event selection cuts for p and n.
+   This macro uses single parameter R to fit simulation dxHCAL plot to data.
    -----
-   P. Datta  Created  03-20-2022 (Based on AJR Puckett's momentum calibration script)
+   P. Datta  Created  08-15-2022
 */
 
 #include "TChain.h"
@@ -593,12 +592,16 @@ void simu_data_fit( const char *configfilename,
 
   cout << endl;
 
+  // Scaling simulation histo which we got using my method
   h_comb_MC->Scale(1./h_comb_MC->Integral());
 
-  double norm = 1./(h_dxHCAL_p->Integral() + R*h_dxHCAL_n->Integral());
+  // leaving the tails for now. Need to implement radiative correction.
+  int lbin = h_dxHCAL_data->FindBin(-1.7);
+  int hbin = h_dxHCAL_data->FindBin(0.5);
 
-  // Looping over bins
-  for(int ibin=0;ibin<90;ibin++){
+  double norm = 1./(h_dxHCAL_p->Integral() + R*h_dxHCAL_n->Integral());
+  // Looping over bins to create combine simulation histo using Andrew's method
+  for(int ibin=lbin;ibin<hbin;ibin++){
     double simu = norm*(h_dxHCAL_p->GetBinContent(ibin) + R*h_dxHCAL_n->GetBinContent(ibin));
     h_comb_MC_ap->SetBinContent(ibin, simu);
     h_n->SetBinContent(ibin, norm*(R*h_dxHCAL_n->GetBinContent(ibin)));
@@ -618,22 +621,24 @@ void simu_data_fit( const char *configfilename,
   h_dxHCAL_data->Draw();
   h_comb_MC_ap->Draw("same");
 
+  // looping over bins again to calculate chi2
   double chi2 = 0., chi2_ap = 0.;
-  for(int ibin=0;ibin<90;ibin++)
+  for(int ibin=lbin;ibin<hbin;ibin++)
     {
       double simu = h_comb_MC->GetBinContent(ibin);
       double simu_ap = h_comb_MC_ap->GetBinContent(ibin);
       double data = h_dxHCAL_data->GetBinContent(ibin);
       if(data>0)
 	{ 
-	  double dataErr = sqrt(data)/h_dxHCAL_data->Integral();
-	  chi2 += (data-simu)*(data-simu) / (dataErr)*(dataErr);
-	  chi2_ap += (data-simu_ap)*(data-simu_ap) / (dataErr)*(dataErr);
+	  double dataErr = sqrt(data)/sqrt(h_dxHCAL_data->GetEntries());
+	  chi2 += (data-simu)*(data-simu) / ((dataErr)*(dataErr));
+	  chi2_ap += (data-simu_ap)*(data-simu_ap) / ((dataErr)*(dataErr));
 	}
     }
 
   cout << endl << "---" << endl
-       << "R = " << R << " chi2 = " << chi2 << " chi2_ap " << chi2_ap 
+       << "R = " << R << " chi2 = " << chi2 << " chi2_ap " 
+       << chi2_ap << " lbin = " << lbin << " hbin = " << hbin
        << endl << "---" << endl;
 
   ofstream datafile1("chi2_vs_R_sbs50_.82T.csv", ios_base::app | ios_base::out);
