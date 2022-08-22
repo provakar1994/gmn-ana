@@ -1,0 +1,7 @@
+{
+"tag"           : "bcm-calib_02-05-22",
+"ROOTfile-path" : "/lustre19/expphy/volatile/halla/sbs/flay/GMnAnalysis/rootfiles",
+"unser-cc-path" : "./output/calib-coeff/unser/precision-source_12-07-21.csv",
+"fit-min"       : [ 0, 0, 0, 0, 0, 0],
+"fit-max"       : [35,35,35,35,35,35]
+}
