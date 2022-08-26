@@ -67,7 +67,7 @@ void simu_data_fit( const char *configfilename,
   // 7. HCAL distance
 
   // lets read in the real data histograms
-  TFile *fdata = new TFile("../sbs4_sbs50p_ld2.root");
+  TFile *fdata = new TFile("../pdout/sbs4_sbs50p_ld2.root");
 
   TChain *C = new TChain("T");
   
@@ -616,6 +616,8 @@ void simu_data_fit( const char *configfilename,
   h_comb_MC->Draw("same");
   h_comb_MC->SetLineColor(1);
   h_comb_MC->SetMarkerStyle(8);
+  h_n->Draw("same");
+  h_p->Draw("same");
 
   c1->cd(2);
   h_dxHCAL_data->Draw();
