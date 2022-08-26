@@ -166,6 +166,7 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
 
    TChain *ch = nullptr; 
    ch = new TChain(treeName); 
+   std::cout << " ** " << filePath << std::endl;
    ch->Add(filePath);
    int NN = ch->GetEntries();
 
@@ -177,7 +178,7 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
    if(aTree==nullptr) return 1; 
 
    aTree->SetBranchAddress("evnum"            ,&trigEvt );
-   aTree->SetBranchAddress("evNumber"         ,&trigEvt2 );
+   //aTree->SetBranchAddress("evNumber"         ,&trigEvt2 );
    aTree->SetBranchAddress(Form("%s.bcm.unser.cnt" ,arm.c_str()),&unser_cnt );
    aTree->SetBranchAddress(Form("%s.bcm.unser.rate",arm.c_str()),&unser_rate);
    aTree->SetBranchAddress(Form("%s.bcm.unser.current",arm.c_str()),&unser_cur);
@@ -319,7 +320,8 @@ int BCMManager::LoadEPICSDataFromTree(const char *filePath,int runNumber){
 
    if(fIsDebug) std::cout << "[BCMManager::LoadEPICSDataFromTree]: Loading data from tree: E" << std::endl; 
 
-   double epicsTime=0,IBC1H04CRCUR2=0,hac_bcm_average=0,halla_p=0;
+   Long64_t epicsTime=0;
+   double IBC1H04CRCUR2=0,hac_bcm_average=0,halla_p=0;
    double IPM1H04A_XPOS=0,IPM1H04A_YPOS=0; 
    double IPM1H04E_XPOS=0,IPM1H04E_YPOS=0;
    double hac_bcm_dvm1_read=0,hac_bcm_dvm2_read=0; 

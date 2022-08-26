@@ -79,17 +79,18 @@ namespace bcm_util {
       std::vector<double> I;
       // accumulate charge over the whole run for each variable  
       for(int i=0;i<N;i++){
-	 if(i==0){
-	    timeStep = runData[1].time - runData[0].time;
-	 }else{
-	    timeStep = runData[i].time - runData[i-1].time;
-	 }
-	 current = runData[i].getValue(var)*MICROAMPS; // in A
-	 // if(i<10){
-	 //    std::cout << Form("event %d, timeStep = %.3lf sec",i,timeStep) << std::endl;
-	 // }
-	 chargeSum += timeStep*current;  
-         I.push_back(current);
+	if(i==0){
+	  timeStep = runData[1].time - runData[0].time;
+	}else{
+	  timeStep = runData[i].time - runData[i-1].time;
+	}
+	current = runData[i].getValue(var)*MICROAMPS; // in A
+	// if(i<10){
+	//    std::cout << Form("event %d, timeStep = %.3lf sec",i,timeStep) << std::endl;
+	// }
+	chargeSum += timeStep*current;  
+	I.push_back(current);
+	// std::cout << " timestep = " << timeStep << std::endl;
       }
       // calculate (statistical) uncertainty 
       double mean_i    = math_df::GetMean<double>(I); 

@@ -125,13 +125,14 @@ namespace util_df {
 	 }else{
 	    std::cout << "[util_df::LoadBCMData]: Loading " << NF << " ROOT files..." << std::endl;
 	    for(int j=0;j<NF;j++){
-	       filePrefix = Form("%s/gmn_replayed-beam_%d_stream%d_seg%d_%d",
+	      // filePrefix = Form("%s/gmn_replayed-beam_%d_stream%d_seg%d_%d",
+	       filePrefix = Form("%s/e1209019_fullreplay_%d_stream%d_seg%d_%d",
 		     runList[i].rfPrefix.c_str(),runList[i].runNumber,runList[i].stream,runList[i].segmentBegin,runList[i].segmentEnd);
-	       if(j==0){
-		  filePath = Form("%s.root",filePrefix.Data());
-	       }else{
-		  filePath = Form("%s_%d.root",filePrefix.Data(),j);
-	       }
+	       //if(j==0){
+	       filePath = Form("%s.root",filePrefix.Data());
+	       // }else{
+	       // 	  filePath = Form("%s_%d.root",filePrefix.Data(),j);
+	       // }
 	       mgr->LoadFile(filePath,runList[i].runNumber);
 	    }
 	    std::cout << "[util_df::LoadBCMData]: Done!" << std::endl;
@@ -148,8 +149,9 @@ namespace util_df {
       }
       std::string myStr;
       while ((entry = readdir(dir)) != NULL) {
-	 myStr = entry->d_name;
-	 list.push_back(myStr);
+	// std::cout << " mystr= " << myStr << std::endl;
+	myStr = entry->d_name;
+	list.push_back(myStr);
       }
       closedir(dir);
    }
@@ -200,14 +202,19 @@ namespace util_df {
       std::vector<std::string> fileList; 
       ListDirectory(rfDirPath,fileList); 
       
+      //std::cout << "**** fileList.size() " << fileList.size() << std::endl;
+      for (int i = 0; i < fileList.size(); i++) {
+	std::cout << " fileList[" << i << "] = " << fileList[i] << std::endl;
+      }
+
       // skip first two entries since we get . and .. at top of list
       for(int i=0;i<2;i++) fileList.erase(fileList.begin()); 
 
       // identify the right index, and find number of files 
-      int j=-1,fileCnt=0,theRun=0;
+      int j=-1, fileCnt=0, theRun=0;
       const int NF = fileList.size();
       std::vector<std::string> o1;
-      for(int i=0;i<NF;i++){ 
+      for(int i=0; i<NF; i++){ 
 	 // split each entry based on a sufficient delimiter 
 	 SplitString('_',fileList[i],o1);
 	 // 3rd entry (index 2) is the one that has the run number 
@@ -215,9 +222,12 @@ namespace util_df {
          if(theRun==run){
 	    fileCnt++; 
 	    if(fileCnt==1) j = i; // found first ROOT file, save this index  
+	    //std::cout << " ** 0 " << o1[0] << " *1* " << o1[1] << " *2* " << o1[2] << std::endl;
          }
 	 o1.clear();
       } 
+
+      std::cout << " ** fileCnt = " << fileCnt << std::endl;
 
       if(fileCnt==0){
 	 std::cout << "[util::GetROOTFileMetaData]: No ROOT files for run " << run << "!" << std::endl;
