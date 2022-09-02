@@ -284,6 +284,7 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
 	 pt.bbcalHi_rate = bbcal_hi_rate;
 	 pt.L1A_rate     = L1A_rate;
 	 // lets calculate the DAQ live time 
+	 liveTime = 0.;
 	 if (bbcal_hi_rate != 0) liveTime = L1A_rate / bbcal_hi_rate;
 	 pt.liveTime     = liveTime;
 	 pt.event        = fEvtCntrSBS; 
