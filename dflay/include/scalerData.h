@@ -42,6 +42,7 @@ typedef struct scalerData {
   double dnewRate_ps;       // downstream BCM x1  (digital) rate (pedestal subtracted) [Hz]  
   double bbcalHi_rate;      // BBCal Hi trigger rate [Hz]
   double L1A_rate;          // L1A rate [Hz]
+  double liveTime;          // DAQ live time: L1A / BBCal Hi
   int runNumber;            // CODA run number
   int runEvent;             // event number in a given CODA run              
   int event;                // "global" event number -- that is, an entry number based on how many runs are chained together       
@@ -57,7 +58,7 @@ scalerData():
     dnewRate(0),dnewCounts(0),dnewCurrent(0),d1Rate(0),d1Counts(0),d1Current(0),
     d3Rate(0),d3Counts(0),d3Current(0),d10Rate(0),d10Counts(0),d10Current(0),
     unserRate_ps(0),u1Rate_ps(0),unewRate_ps(0),d1Rate_ps(0),d3Rate_ps(0),d10Rate_ps(0),dnewRate_ps(0),
-    bbcalHi_rate(0), L1A_rate(0), runNumber(0),runEvent(0),event(0),triggerEvent(0),triggerEvent2(0)
+    bbcalHi_rate(0), L1A_rate(0), liveTime(0), runNumber(0),runEvent(0),event(0),triggerEvent(0),triggerEvent2(0)
   {} 
   // get value of the member variable based on name 
   double getValue(std::string varName){
@@ -96,6 +97,7 @@ scalerData():
     if(varName.compare("dnew.rate.ps")==0)   val = dnewRate_ps;
     if(varName.compare("dnew.cnt")==0)       val = dnewCounts;
     if(varName.compare("dnew.current")==0)   val = dnewCurrent;
+    if(varName.compare("liveTime")==0)       val = liveTime;
     if(varName.compare("sbs.L1A.scalerRate")==0)                val = L1A_rate;
     if(varName.compare("sbs.BBCalHi.BBCALTRG.scalerRate")==0)   val = bbcalHi_rate;
     return val;
@@ -135,7 +137,8 @@ scalerData():
 		<< Form("dnew current = %.3lf " ,dnewCurrent) << std::endl;
     }else if(type.compare("trigrate")==0){
       std::cout << Form("BBCal Hi Trigger Rate = %.3lf ",bbcalHi_rate)
-		<< Form("L1A rate = %.3lf " ,L1A_rate) << std::endl;
+		<< Form("L1A rate = %.3lf "             ,L1A_rate)
+		<< Form("DAQ Live Time = %.3lf "        ,liveTime) << std::endl;
     }
     return 0;
   } 

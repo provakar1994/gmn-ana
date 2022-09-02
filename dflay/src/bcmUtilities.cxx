@@ -174,7 +174,32 @@ namespace bcm_util {
     return g; 
   }
   //______________________________________________________________________________
-  int GetCharge_pd(std::string var, std::vector<scalerData_t> runData, charge_t &out){
+  double GetDAQLiveTime (std::vector<scalerData_t> runData) {
+    // calculate the average DAQ live time during the run
+    int N = runData.size();
+    double liveTime = 0.;
+
+    std::vector<double> frac;
+    for (int i = 0; i < N; i++) {
+      frac.push_back( runData[i].liveTime );
+    }
+
+    liveTime = math_df::GetMean<double>(frac); 
+ 
+    // few sanity checks
+    if (liveTime < 0.5)
+      std::cout << " *!* For run " << runData[0].runNumber 
+		<< " *!* Live Time seems very low! " << std::endl;
+    else if (liveTime > 1. && liveTime <= 1.1) 
+      liveTime = 1.;
+    else if (liveTime > 1.1)
+      std::cout << " **!** For run " << runData[0].runNumber 
+		<< " **!** Live time unphysical! Needs attention!" << std::endl;
+ 
+    return liveTime;
+  }
+  //______________________________________________________________________________
+  int GetCharge_pd (std::string var, std::vector<scalerData_t> runData, charge_t &out) {
     // get the charge associated with the run
     int N = runData.size();
     double MICROAMPS = 1E-6; 
@@ -207,12 +232,16 @@ namespace bcm_util {
       if (i == N-1) chargeAtMaxEv = a;
     }
     
+    // few sanity checks
     if (maxCharge != chargeAtMaxEv) {
       std::cout << " **!** For run " << runData[0].runNumber
-		<< " Scaler event corresponding to highest charge [" << maxChargeEv
+		<< " **!** Scaler event corresponding to highest charge [" << maxChargeEv
 		<< "] is not the last event [" << N << "], for which charge = "
 		<< chargeAtMaxEv << std::endl;
     }
+    if (maxCharge < 0.)
+      std::cout << " **!** For run " << runData[0].runNumber
+		<< " **!** Charge value unphysical! Needs Attention! " << std::endl;
 
     // calculate (statistical) uncertainty [Not necessary at the moment] 
     double chargeErr = 0.;   

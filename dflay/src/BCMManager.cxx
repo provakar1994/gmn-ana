@@ -163,7 +163,7 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
    double d1_rate=0,d1_cnt=0,d1_cur=0;
    double d3_rate=0,d3_cnt=0,d3_cur=0;
    double d10_rate=0,d10_cnt=0,d10_cur=0;
-   double bbcal_hi_rate=0., L1A_rate=0.;
+   double bbcal_hi_rate=0., L1A_rate=0., liveTime=0.;
 
    TChain *ch = nullptr; 
    ch = new TChain(treeName); 
@@ -279,11 +279,14 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
 	 fLeft.push_back(pt); 
 	 fEvtCntrLeft++;
       }else if(arm.compare("sbs")==0){
-	 pt.time       = fLastTimeSBS + time; 
-	 pt.time103kHz = fLastTimeSBS + time103kHz; 
+	 pt.time         = fLastTimeSBS + time; 
+	 pt.time103kHz   = fLastTimeSBS + time103kHz; 
 	 pt.bbcalHi_rate = bbcal_hi_rate;
-	 pt.L1A_rate  = L1A_rate;
-	 pt.event    = fEvtCntrSBS; 
+	 pt.L1A_rate     = L1A_rate;
+	 // lets calculate the DAQ live time 
+	 if (bbcal_hi_rate != 0) liveTime = L1A_rate / bbcal_hi_rate;
+	 pt.liveTime     = liveTime;
+	 pt.event        = fEvtCntrSBS; 
 	 if(runNumber==fLastRun){
 	    pt.runEvent = fLastRunEvtCntSBS + i; 
 	 }else{
