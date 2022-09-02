@@ -22,7 +22,10 @@ namespace util_df {
    int LoadRunList(const char *inpath,const char *rfPrefix,std::vector<codaRun_t> &runList); 
    int LoadBCMData(std::vector<codaRun_t> runList,BCMManager *mgr); 
    int SplitString(const char delim,const std::string myStr,std::vector<std::string> &out); 
-   int GetROOTFileMetaData(const char *rfDirPath,int run,std::vector<int> &data,bool isDebug=false);
+   // int GetROOTFileMetaData(const char *rfDirPath,int run,std::vector<int> &data,
+   // std::vector<int> &segBeg,std::vector<int> &segEnd,bool isDebug=false);
+   int GetROOTFileMetaData(const char *rfDirPath, int run, std::vector<int> &data,
+			   std::vector<pair<int, int>> &segB_segE, bool isDebug=false);
 } 
 
 #endif 
