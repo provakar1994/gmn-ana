@@ -50,7 +50,7 @@ int BCMManager::LoadFile(const char *filePath,int runNumber){
    int fail=0;
    int rc = CheckFile(filePath); 
    if(rc!=0){
-      std::cout << "[BCMManager::LoadFile]: Cannot open the file for run " << runNumber << std::endl;
+      std::cout << "[BCMManager::LoadFile]: Cannot open the file " << filePath << std::endl;
       return rc;
    }
 
@@ -65,11 +65,11 @@ int BCMManager::LoadFile(const char *filePath,int runNumber){
    int notFound=0;
    int NR=fRunList.size(); 
    if(rc_sbs==0){
-      std::cout << Form("-----------------------------------------") << std::endl;
-      std::cout << Form("[BCMManager::LoadFile]: Load successful: ") << std::endl;
-      std::cout << Form("Run:  %d"      ,runNumber) << std::endl;
-      std::cout << Form("Date: %s (%lu)",fTimeStamp.c_str(),fUTCTimeStamp) << std::endl;
-      std::cout << Form("-----------------------------------------") << std::endl;
+      // std::cout << Form("-----------------------------------------") << std::endl;
+      // std::cout << Form("[BCMManager::LoadFile]: Load successful: ") << std::endl;
+      // std::cout << Form("Run:  %d"      ,runNumber) << std::endl;
+      // std::cout << Form("Date: %s (%lu)",fTimeStamp.c_str(),fUTCTimeStamp) << std::endl;
+      // std::cout << Form("-----------------------------------------") << std::endl;
       // std::cout << Form("[BCMManager::LoadFile]: Loaded run %d, recorded on %s (%lu)",runNumber,fTimeStamp.c_str(),fUTCTimeStamp) << std::endl;
       for(int i=0;i<NR;i++){
 	 if(runNumber!=fRunList[i]) notFound += 1;
@@ -163,10 +163,11 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
    double d1_rate=0,d1_cnt=0,d1_cur=0;
    double d3_rate=0,d3_cnt=0,d3_cur=0;
    double d10_rate=0,d10_cnt=0,d10_cur=0;
+   double bbcal_hi_rate=0., L1A_rate=0.;
 
    TChain *ch = nullptr; 
    ch = new TChain(treeName); 
-   std::cout << " ** " << filePath << std::endl;
+   // std::cout << " ** " << filePath << std::endl;
    ch->Add(filePath);
    int NN = ch->GetEntries();
 
@@ -203,13 +204,15 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
    if(arm.compare("Left")==0){
       aTree->SetBranchAddress(Form("Left.104kHz_CLK.cnt")       ,&time_num);
       aTree->SetBranchAddress(Form("Left.104kHz_CLK.rate")      ,&time_den);
-      aTree->SetBranchAddress(Form("Left.104kHz_CLK.cnt")       ,&time103kHz_num);
-      aTree->SetBranchAddress(Form("Left.104kHz_CLK.rate")      ,&time103kHz_den);
+      // aTree->SetBranchAddress(Form("Left.104kHz_CLK.cnt")       ,&time103kHz_num);
+      // aTree->SetBranchAddress(Form("Left.104kHz_CLK.rate")      ,&time103kHz_den);
    }else if(arm.compare("sbs")==0){
       aTree->SetBranchAddress(Form("sbs.BBCalHi.RF.scaler")     ,&time_num);
       aTree->SetBranchAddress(Form("sbs.BBCalHi.RF.scalerRate") ,&time_den);
       aTree->SetBranchAddress(Form("sbs.104kHz_CLK.cnt")        ,&time103kHz_num);
       aTree->SetBranchAddress(Form("sbs.104kHz_CLK.rate")       ,&time103kHz_den);
+      aTree->SetBranchAddress(Form("sbs.BBCalHi.BBCALTRG.scalerRate")       ,&bbcal_hi_rate);
+      aTree->SetBranchAddress(Form("sbs.L1A.scalerRate")        ,&L1A_rate);
    }
 
    scalerData_t pt; 
@@ -221,11 +224,14 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
       }else{
 	 time = 0;  
       } 
-      if(time103kHz_den!=0){
-	 time103kHz = (double)fUTCTimeStamp + time103kHz_num/time103kHz_den;
-      }else{
-	 time103kHz = 0;
-      }
+      // This is the right way to calculate time but time103kHz_den often gives
+      // erreneous readings. The way out is to use a fixed value instead. 
+      // if(time103kHz_den!=0){
+      // 	time103kHz = (double)fUTCTimeStamp + time103kHz_num/time103kHz_den;
+      // }else{
+      // 	time103kHz = 0;
+      // }
+      time103kHz = time103kHz_num / 103700.;
       pt.triggerEvent   = trigEvt;
       pt.triggerEvent2  = (signed long long)trigEvt2;
       pt.time_num       = time_num;  
@@ -275,6 +281,8 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
       }else if(arm.compare("sbs")==0){
 	 pt.time       = fLastTimeSBS + time; 
 	 pt.time103kHz = fLastTimeSBS + time103kHz; 
+	 pt.bbcalHi_rate = bbcal_hi_rate;
+	 pt.L1A_rate  = L1A_rate;
 	 pt.event    = fEvtCntrSBS; 
 	 if(runNumber==fLastRun){
 	    pt.runEvent = fLastRunEvtCntSBS + i; 
@@ -320,7 +328,8 @@ int BCMManager::LoadEPICSDataFromTree(const char *filePath,int runNumber){
 
    if(fIsDebug) std::cout << "[BCMManager::LoadEPICSDataFromTree]: Loading data from tree: E" << std::endl; 
 
-   Long64_t epicsTime=0;
+   Long64_t epicsTimeL64=0;
+   double epicsTime=0;
    double IBC1H04CRCUR2=0,hac_bcm_average=0,halla_p=0;
    double IPM1H04A_XPOS=0,IPM1H04A_YPOS=0; 
    double IPM1H04E_XPOS=0,IPM1H04E_YPOS=0;
@@ -352,14 +361,23 @@ int BCMManager::LoadEPICSDataFromTree(const char *filePath,int runNumber){
    aTree->SetBranchAddress("hac_bcm_dvm1_current",&hac_bcm_dvm1_current);
    aTree->SetBranchAddress("hac_bcm_dvm2_current",&hac_bcm_dvm1_current);
    aTree->SetBranchAddress("IBC1H04CRCUR2"       ,&IBC1H04CRCUR2       );
-   aTree->SetBranchAddress("timestamp"           ,&epicsTime           );
+   if (runNumber < 13200) {
+     aTree->SetBranchAddress("timestamp"         ,&epicsTimeL64         );
+   } else {
+     aTree->SetBranchAddress("timestamp"         ,&epicsTime           );
+   }
 
    epicsData_t pt; 
    for(int i=0;i<NN;i++){
       aTree->GetEntry(i); 
       pt.event           = fEvtCntrEPICS; 
       pt.runNumber       = runNumber;
-      pt.time            = epicsTime;
+      // pt.time            = epicsTime;
+      if (runNumber < 13200) {
+	pt.time          = epicsTimeL64;
+      } else {
+	pt.time          = epicsTime;
+      }
       if(runNumber==fLastRun){
 	 pt.runEvent = fLastRunEvtCntEPICS + i; 
       }else{
