@@ -7,6 +7,7 @@ namespace setrootvar {
 		 std::string suffix,
 		 void* memory)
   {
+    T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
     branchname = prefix + std::string(".") + suffix;
     T->SetBranchStatus(branchname.c_str(),1);
@@ -22,6 +23,7 @@ namespace setrootvar {
       std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
+    T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
     for(int i=0;i<suffix.size();i++){
       branchname = prefix + std::string(".") + suffix[i];
@@ -40,6 +42,7 @@ namespace setrootvar {
       std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
+    T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
     for(int i=0;i<suffix.size();i++){
       if(i!=ndatavarpos){
@@ -64,6 +67,7 @@ namespace setrootvar {
       std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
+    T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
     for(int i=0;i<suffix.size();i++){
       if(std::find(ndatapos.begin(),ndatapos.end(),i)!=ndatapos.end()){
