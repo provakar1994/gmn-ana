@@ -50,8 +50,8 @@ int bcmCheckCharge(const char *confPath){
    charge_t qData; 
    std::vector<scalerData_t> runData;
 
-   TCanvas *c1 = new TCanvas("c1", "c1", 600, 900);
-   c1->Divide(1,3);
+   TCanvas *c1 = new TCanvas("c1", "c1", 600, 800);
+   c1->Divide(1,2);
    c1->cd(1);
 
    for(int i=0;i<NNR;i++){
@@ -64,18 +64,28 @@ int bcmCheckCharge(const char *confPath){
        graph_df::SetLabels(g1, "Beam Current", "event", "dnew.current (uA)");
        g1->Draw("alp");
 
-       c1->cd(2);
-       TGraph *g2 = bcm_util::GetTGraph_timeStep("event", runData);
-       graph_df::SetLabels(g2, "Time steps", "event", "Time steps (s)");
-       g2->Draw("alp");
+       // c1->cd(2);
+       // TGraph *g2 = bcm_util::GetTGraph_timeStep("event", runData);
+       // graph_df::SetLabels(g2, "Time steps", "event", "Time steps (s)");
+       // g2->Draw("alp");
        // TH1D *h1 = bcm_util::GetTH1D(runData, "BBCalHi.scalerRate", 500, 3500, 5500);
        // h1->Draw();
 
-       c1->cd(3);
-       TGraph *g3 = bcm_util::GetTGraph_charge_pd("d10.cnt", "time103kHz", runData);
-       // TGraph *g3 = bcm_util::GetTGraph_charge_dnew("event", runData);
-       graph_df::SetLabels(g3, "Beam Charge (C) using dnew source", "scaler events", "Charge (C)");
-       g3->Draw("alp");
+       // c1->cd(2);
+       // TGraph *g3 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "time103kHz", runData);
+       // graph_df::SetLabels(g3, "Beam Charge (C) using dnew source", "time (s)", "Charge (C)");
+       // g3->Draw("alp");
+
+       c1->cd(2);
+       TGraph *g4 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "event", runData);
+       graph_df::SetLabels(g4, "Beam Charge (C) using dnew source", "event", "Charge (C)");
+       g4->Draw("alp");
+
+       // c1->cd(4);
+       // TH1D *h1 = bcm_util::GetTH1D(runData, "liveTime", 100, 0.5, 1.5);
+       // // std::cout << " Live Time " << 0.5 + h1->GetMaximumBin()*h1->GetBinWidth(1) << std::endl;
+       // h1->Draw();
+
      }
 
      // c1->cd(3);
@@ -94,9 +104,10 @@ int bcmCheckCharge(const char *confPath){
      std::cout << "------------------------------------" << std::endl;
      std::cout << Form("Run %d: ",rr[i]) << std::endl;
 
-     bcm_util::GetCharge_pd("d10.cnt", runData, qData);
+     bcm_util::GetCharge_pd("dnew.cnt", runData, qData);
      std::cout << Form(" dnew.cnt : totalTime = %.3lf sec (%.1lf min), Q = %.3E C",
 		       qData.totalTime,qData.totalTime/60.,qData.value) << std::endl;
+     std::cout << " DAQ Live Time = " << bcm_util::GetDAQLiveTime(runData) << std::endl;
 
      // set up for next run
      runData.clear();
