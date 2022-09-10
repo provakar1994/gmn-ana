@@ -103,7 +103,7 @@ namespace bcm_util {
     const int N = data.size();
     for(int i=0;i<N;i++){
 
-      chargeSum = (data[i].getValue("dnew.cnt") / 3318.)*MICROAMPS; // in C
+      chargeSum = (data[i].getValue(var) / gain)*MICROAMPS; // in C
 
       ix = data[i].getValue(xAxis);
       iy = chargeSum;
@@ -181,19 +181,20 @@ namespace bcm_util {
 
     std::vector<double> frac;
     for (int i = 0; i < N; i++) {
-      frac.push_back( runData[i].liveTime );
+      if (runData[i].liveTime < 1.2) // This cut avoids events during beam trips
+	frac.push_back( runData[i].liveTime );
     }
 
     liveTime = math_df::GetMean<double>(frac); 
  
     // few sanity checks
     if (liveTime < 0.5)
-      std::cout << " *!* For run " << runData[0].runNumber 
+      std::cout << " *!* For run " << runData[0].runNumber << std::endl
 		<< " *!* Live Time seems very low! " << std::endl;
-    else if (liveTime > 1. && liveTime <= 1.1) 
+    else if (liveTime > 1. && liveTime <= 1.2) 
       liveTime = 1.;
-    else if (liveTime > 1.1)
-      std::cout << " **!** For run " << runData[0].runNumber 
+    else if (liveTime > 1.2)
+      std::cout << " **!** For run " << runData[0].runNumber << std::endl
 		<< " **!** Live time unphysical! Needs attention!" << std::endl;
  
     return liveTime;
@@ -224,7 +225,7 @@ namespace bcm_util {
     int maxChargeEv = 0;
     double a = 0., maxCharge = -1.;
     for(int i=0;i<N;i++){
-      a = (runData[i].getValue("dnew.cnt") / gain) * MICROAMPS; // charge in C
+      a = (runData[i].getValue(var) / gain) * MICROAMPS; // charge in C
       if (maxCharge < a) { 
 	maxCharge = a;
 	maxChargeEv = i;
