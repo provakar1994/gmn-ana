@@ -109,7 +109,15 @@ namespace expconst {
     }
   }
   //--------------------------------------------
-
+  void LoadSBSconfig(int conf, SBSconfig_t &sbsconf) {
+    sbsconf.sbsconf   = conf;
+    sbsconf.Ebeam     = expconst::ebeam(conf);
+    sbsconf.BBtheta   = expconst::bbtheta(conf);
+    sbsconf.BBdist    = expconst::bbdist(conf);
+    sbsconf.SBStheta  = expconst::sbstheta(conf);
+    sbsconf.SBSdist   = expconst::sbsdist(conf);
+    sbsconf.HCALdist  = expconst::hcaldist(conf);
+  }
 } //::expconst
 
 

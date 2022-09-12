@@ -1,6 +1,8 @@
 #ifndef EXP_CONSTANTS_H
 #define EXP_CONSTANTS_H
 
+#include "SBSconfig.h"
+
 namespace expconst {
 
   // Detector variables
@@ -37,7 +39,9 @@ namespace expconst {
   double sbstheta(int config);  //deg
   double sbsdist(int config);  //m
   double hcaldist(int config);  //m
-  
+
+  // Load a sbsconfig object with relevant parameters
+  void LoadSBSconfig(int conf, SBSconfig_t &sbsconf);
 }
 
 #endif
