@@ -1,8 +1,13 @@
 #ifndef CONST_H
 #define CONST_H
 
+#include "TMath.h"
+
 namespace constant {
 
+  // math
+  static const double pi = TMath::Pi();
+  
   // electron
   static const double qe = 1.602176634E-19; // C
   static const double Me = 0.5109989461E-03; // +/- 31E-13 GeV

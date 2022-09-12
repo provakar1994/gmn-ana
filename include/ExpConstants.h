@@ -18,13 +18,13 @@ namespace expconst {
   static const double tarlen = 15.0;  //cm
  
   // LH2
-  static const double lh2tarrho = 0.0723;  //g/cc
-  static const double lh2cthick = 0.02; //cm
-  static const double lh2uwallthick = 0.0145; //cm
-  static const double lh2dwallthick = 0.015;  //cm
+  static const double lh2tarrho = 0.0723;     //g/cc, target density
+  static const double lh2cthick = 0.02;       //cm, target cell thickness
+  static const double lh2uwallthick = 0.0145; //cm, upstream wall thickness
+  static const double lh2dwallthick = 0.015;  //cm, downstream wall thickness
 
   // LD2
-  static const double ld2tarrho = 0.169;  //g/cc
+  static const double ld2tarrho = 0.169;      //g/cc, target density
 
   // magnet
   static const double dipolegap = 1.22;  //m
