@@ -704,7 +704,8 @@ void hcal_dxdy_simu( const char *configfilename,
       // T_thetapq = theta_pq; //57.29578*theta_pq;
       // ****
 
-      // Usually when we are running this code, the angle reconstruction is already well calibrated, but the momentum reconstruction is
+      // Usually when we are running this code, the angle reconstruction is already well 
+      // calibrated, but the momentum reconstruction is
       // unreliable; use pel(theta) as electron momentum for kinematic correlation:
       // Model 0 = uses reconstructed p as independent variable
       // model 1 = uses reconstructed angles as independent variable
