@@ -59,32 +59,42 @@ int bcmCheckCharge(const char *confPath){
      // get data for the run
      mgr->GetVector_scaler("sbs",rr[i],runData);
 
-     if (i == 2) {
+     if (i == 0) {
        TGraph *g1 = bcm_util::GetTGraph("event", "dnew.current", runData);
-       graph_df::SetLabels(g1, "Beam Current", "event", "dnew.current (uA)");
+       graph_df::SetLabels(g1, Form("Run # %d: Beam Current (uA)", runData[0].runNumber), 
+			   "event", "dnew.current (uA)");
        g1->Draw("alp");
 
        // c1->cd(2);
        // TGraph *g2 = bcm_util::GetTGraph_timeStep("event", runData);
-       // graph_df::SetLabels(g2, "Time steps", "event", "Time steps (s)");
+       // graph_df::SetLabels(g2, Form("Run # %d: Time steps", runData[0].runNumber), 
+       // 			   "event", "Time steps (s)");
        // g2->Draw("alp");
        // TH1D *h1 = bcm_util::GetTH1D(runData, "BBCalHi.scalerRate", 500, 3500, 5500);
        // h1->Draw();
 
+       // c1->cd(2); 
+       // // TGraph *g4 = bcm_util::GetTGraph_charge("event", "dnew.current", runData); // dflay method
+       // TGraph *g4 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "event", runData);
+       // graph_df::SetLabels(g4, Form("Run # %d: Beam Charge (C) using dnew source", runData[0].runNumber),
+       // 			   "event", "Charge (C)");
+       // g4->Draw("alp");
+
        // c1->cd(2);
        // TGraph *g3 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "time103kHz", runData);
-       // graph_df::SetLabels(g3, "Beam Charge (C) using dnew source", "time (s)", "Charge (C)");
+       // graph_df::SetLabels(g3, Form("Run # %d: Beam Charge (C) using dnew source", runData[0].runNumber), 
+       // 			   "time (s)", "Charge (C)");
        // g3->Draw("alp");
 
-       c1->cd(2);
-       TGraph *g4 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "event", runData);
-       graph_df::SetLabels(g4, "Beam Charge (C) using dnew source", "event", "Charge (C)");
-       g4->Draw("alp");
+       // c1->cd(2);
+       // TGraph *g4 = bcm_util::GetTGraph_charge_pd("dnew.cnt", "event", runData);
+       // graph_df::SetLabels(g4, "Beam Charge (C) using dnew source", "event", "Charge (C)");
+       // g4->Draw("alp");
 
-       // c1->cd(4);
-       // TH1D *h1 = bcm_util::GetTH1D(runData, "liveTime", 100, 0.5, 1.5);
-       // // std::cout << " Live Time " << 0.5 + h1->GetMaximumBin()*h1->GetBinWidth(1) << std::endl;
-       // h1->Draw();
+       c1->cd(2);
+       TH1D *h1 = bcm_util::GetTH1D(runData, "liveTime", 100, 0.5, 1.5);
+       // std::cout << " Live Time " << 0.5 + h1->GetMaximumBin()*h1->GetBinWidth(1) << std::endl;
+       h1->Draw();
 
      }
 

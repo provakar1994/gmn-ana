@@ -232,6 +232,7 @@ int BCMManager::LoadDataFromTree(const char *filePath,const char *treeName,int r
       // 	time103kHz = 0;
       // }
       time103kHz = time103kHz_num / 103700.;
+      // time103kHz = time103kHz_num / time103kHz_den;
       pt.triggerEvent   = trigEvt;
       pt.triggerEvent2  = (signed long long)trigEvt2;
       pt.time_num       = time_num;  
@@ -332,8 +333,8 @@ int BCMManager::LoadEPICSDataFromTree(const char *filePath,int runNumber){
 
    if(fIsDebug) std::cout << "[BCMManager::LoadEPICSDataFromTree]: Loading data from tree: E" << std::endl; 
 
-   Long64_t epicsTimeL64=0;
-   double epicsTime=0;
+   Long64_t epicsTime=0;
+   //double epicsTime=0;
    double IBC1H04CRCUR2=0,hac_bcm_average=0,halla_p=0;
    double IPM1H04A_XPOS=0,IPM1H04A_YPOS=0; 
    double IPM1H04E_XPOS=0,IPM1H04E_YPOS=0;
@@ -365,23 +366,14 @@ int BCMManager::LoadEPICSDataFromTree(const char *filePath,int runNumber){
    aTree->SetBranchAddress("hac_bcm_dvm1_current",&hac_bcm_dvm1_current);
    aTree->SetBranchAddress("hac_bcm_dvm2_current",&hac_bcm_dvm1_current);
    aTree->SetBranchAddress("IBC1H04CRCUR2"       ,&IBC1H04CRCUR2       );
-   if (runNumber < 13200) {
-     aTree->SetBranchAddress("timestamp"         ,&epicsTimeL64         );
-   } else {
-     aTree->SetBranchAddress("timestamp"         ,&epicsTime           );
-   }
+   aTree->SetBranchAddress("timestamp"         ,&epicsTime           );
 
    epicsData_t pt; 
    for(int i=0;i<NN;i++){
       aTree->GetEntry(i); 
       pt.event           = fEvtCntrEPICS; 
       pt.runNumber       = runNumber;
-      // pt.time            = epicsTime;
-      if (runNumber < 13200) {
-	pt.time          = epicsTimeL64;
-      } else {
-	pt.time          = epicsTime;
-      }
+      pt.time            = epicsTime;
       if(runNumber==fLastRun){
 	 pt.runEvent = fLastRunEvtCntEPICS + i; 
       }else{

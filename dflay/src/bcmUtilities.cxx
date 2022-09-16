@@ -64,10 +64,15 @@ namespace bcm_util {
     const int N = data.size();
     for(int i=0;i<N;i++){
       if(i==0){
-	timeStep = data[1].time103kHz - data[0].time103kHz;
+      	timeStep = data[1].time103kHz - data[0].time103kHz;
       }else{
-	timeStep = data[i].time103kHz - data[i-1].time103kHz;
+      	timeStep = data[i].time103kHz - data[i-1].time103kHz;
       }
+      // if(i==0){
+      // 	timeStep = data[1].time - data[0].time;
+      // }else{
+      // 	timeStep = data[i].time - data[i-1].time;
+      // }
       ix = data[i].getValue(xAxis);
       iy = timeStep;
       //iy = data[i].time103kHz;
@@ -113,31 +118,37 @@ namespace bcm_util {
     TGraph *g = graph_df::GetTGraph(x,y); 
     return g;       
   }
-  // //______________________________________________________________________________
-  // TGraph *GetTGraph_charge(std::string xAxis, std::string currSource, std::vector<scalerData_t> data){
-  //   // get a plot with data from a vector of scalerData 
-  //   double ix=0, iy=0, timeStep = 0., current = 0., chargeSum = 0.;
-  //   std::vector<double> x,y; 
-  //   double MICROAMPS = 1E-6;
-  //   const int N = data.size();
-  //   for(int i=0;i<N;i++){
-  //     if(i==0){
-  // 	timeStep = data[1].time103kHz - data[0].time103kHz;
-  //     }else{
-  // 	timeStep = data[i].time103kHz - data[i-1].time103kHz;
-  //     }
+  //______________________________________________________________________________
+  TGraph *GetTGraph_charge(std::string xAxis, std::string currSource, std::vector<scalerData_t> data){
+    // get a plot with data from a vector of scalerData 
+    double ix=0, iy=0, timeStep = 0., current = 0., chargeSum = 0.;
+    std::vector<double> x,y; 
+    double MICROAMPS = 1E-6;
+    const int N = data.size();
+    for(int i=0;i<N;i++){
+      if(i==0){
+      	timeStep = data[1].time103kHz - data[0].time103kHz;
+      }else{
+      	timeStep = data[i].time103kHz - data[i-1].time103kHz;
+      }
+      // if(i==0){
+      // 	timeStep = data[1].time - data[0].time;
+      // }else{
+      // 	timeStep = data[i].time - data[i-1].time;
+      // }
 
-  //     current = data[i].getValue(currSource)*MICROAMPS; // in A
-  //     chargeSum += timeStep*current;
+      current = data[i].getValue(currSource)*MICROAMPS; // in A
+      chargeSum += timeStep*current;
 
-  //     ix = data[i].getValue(xAxis);
-  //     iy = chargeSum;
-  //     x.push_back(ix); 
-  //     y.push_back(iy); 
-  //   }
-  //   TGraph *g = graph_df::GetTGraph(x,y); 
-  //   return g;       
-  // }
+      ix = data[i].getValue(xAxis);
+      iy = chargeSum;
+      x.push_back(ix); 
+      y.push_back(iy); 
+
+    }
+    TGraph *g = graph_df::GetTGraph(x,y); 
+    return g;       
+  }
   //______________________________________________________________________________
   TGraph *GetTGraph_singleRun(int run,std::string xAxis,std::string yAxis,std::vector<scalerData_t> data){
     // get a plot with data from a single run  
@@ -254,46 +265,46 @@ namespace bcm_util {
     return 0; 
   }
   //______________________________________________________________________________
-  // int GetCharge(std::string var, std::vector<scalerData_t> runData, charge_t &out){
-  //   // get the charge associated with the run
+  int GetCharge(std::string var, std::vector<scalerData_t> runData, charge_t &out){
+    // get the charge associated with the run
 
-  //   int N = runData.size();
-  //   double MICROAMPS = 1E-6; 
-  //   double timeStep=0,chargeSum=0,current=0;
-  //   double deltaTime = runData[N-1].time - runData[0].time;
-  //   std::vector<double> I;
-  //   // accumulate charge over the whole run for each variable  
-  //   for(int i=0;i<N;i++){
-  //     if(i==0){
-  // 	timeStep = runData[1].time - runData[0].time;
-  //     }else{
-  // 	timeStep = runData[i].time - runData[i-1].time;
-  //     }
-  //     current = runData[i].getValue(var)*MICROAMPS; // in A
-  //     // if(i<10){
-  //     //    std::cout << Form("event %d, timeStep = %.3lf sec",i,timeStep) << std::endl;
-  //     // }
-  //     chargeSum += timeStep*current;  
-  //     I.push_back(current);
+    int N = runData.size();
+    double MICROAMPS = 1E-6; 
+    double timeStep=0,chargeSum=0,current=0;
+    double deltaTime = runData[N-1].time - runData[0].time;
+    std::vector<double> I;
+    // accumulate charge over the whole run for each variable  
+    for(int i=0;i<N;i++){
+      if(i==0){
+  	timeStep = runData[1].time - runData[0].time;
+      }else{
+  	timeStep = runData[i].time - runData[i-1].time;
+      }
+      current = runData[i].getValue(var)*MICROAMPS; // in A
+      // if(i<10){
+      //    std::cout << Form("event %d, timeStep = %.3lf sec",i,timeStep) << std::endl;
+      // }
+      chargeSum += timeStep*current;  
+      I.push_back(current);
 
-  //     // std::cout << " timestep = " << timeStep << std::endl;
-  //     //if (i == 2386) {
-  // 	// std::cout << " evCont " << runData[i].event << " triggerEv " << runData[i].triggerEvent 
-  // 	//  	  << " time " << runData[i].time << " timestep " << timeStep
-  // 	// 	  << " time_num " << runData[i].time_num << " time_den " << runData[i].time_den
-  // 	// 	  << " current " << current << " charge " << chargeSum << std::endl;
-  //   }
-  //   // calculate (statistical) uncertainty 
-  //   double mean_i    = math_df::GetMean<double>(I); 
-  //   double stdev_i   = math_df::GetStandardDeviation<double>(I); 
-  //   double chargeErr = GetChargeError(chargeSum,mean_i,stdev_i,deltaTime,0);   
-  //   // save results
-  //   out.runNumber = runData[0].runNumber; 
-  //   out.totalTime = deltaTime; 
-  //   out.value     = chargeSum;
-  //   out.error     = chargeErr;
-  //   return 0; 
-  // }
+      // std::cout << " timestep = " << timeStep << std::endl;
+      //if (i == 2386) {
+  	// std::cout << " evCont " << runData[i].event << " triggerEv " << runData[i].triggerEvent 
+  	//  	  << " time " << runData[i].time << " timestep " << timeStep
+  	// 	  << " time_num " << runData[i].time_num << " time_den " << runData[i].time_den
+  	// 	  << " current " << current << " charge " << chargeSum << std::endl;
+    }
+    // calculate (statistical) uncertainty 
+    double mean_i    = math_df::GetMean<double>(I); 
+    double stdev_i   = math_df::GetStandardDeviation<double>(I); 
+    double chargeErr = GetChargeError(chargeSum,mean_i,stdev_i,deltaTime,0);   
+    // save results
+    out.runNumber = runData[0].runNumber; 
+    out.totalTime = deltaTime; 
+    out.value     = chargeSum;
+    out.error     = chargeErr;
+    return 0; 
+  }
   //______________________________________________________________________________
   double GetChargeError(double Q,double I, double dI,double t,double dt){
     double T1=0,T2=0;
