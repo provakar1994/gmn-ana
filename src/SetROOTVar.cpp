@@ -7,9 +7,13 @@ namespace setrootvar {
 		 std::string suffix,
 		 void* memory)
   {
-    T->SetMakeClass(1); // Allows access to individual sub-branchs
+    T->SetMakeClass(1);    // Allows access to individual sub-branchs
     std::string branchname;
-    branchname = prefix + std::string(".") + suffix;
+    if (suffix.empty()) {  // In case the branch doesn't have <pref.suff> structure
+      branchname = prefix;
+    } else {
+      branchname = prefix + std::string(".") + suffix;
+    }
     T->SetBranchStatus(branchname.c_str(),1);
     T->SetBranchAddress(branchname.c_str(),memory);
   }
