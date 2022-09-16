@@ -1,9 +1,0 @@
-{
-    "SBS_config"         : 4,
-    "SBS_magnet_percent" : 50,
-    "global_cut"         : "bb.tr.n==1&&bb.ps.e>0.2&&abs(bb.tr.vz[0])<.08&&bb.gem.track.nhits>3&&abs(bb.etot_over_p-0.92)<0.2&&sbs.hcal.e>0.025&&bb.ps.e+bb.sh.e>1.7",
-    "W_min"              : 0.7,
-    "W_max"              : 1.12,
-    "dpel_min"           : -0.033,
-    "dpel_max"           : 0.016
-}
