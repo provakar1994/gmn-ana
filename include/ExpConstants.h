@@ -1,6 +1,7 @@
 #ifndef EXP_CONSTANTS_H
 #define EXP_CONSTANTS_H
 
+#include "TMath.h"
 #include "SBSconfig.h"
 
 namespace expconst {
@@ -41,7 +42,7 @@ namespace expconst {
   double hcaldist(int config);  //m
 
   // Load a sbsconfig object with relevant parameters
-  void LoadSBSconfig(int conf, SBSconfig_t &sbsconf);
+  void LoadSBSconfig(int conf, int sbsmag, SBSconfig_t &sbsconf);
 }
 
 #endif
