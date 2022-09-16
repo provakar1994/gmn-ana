@@ -1,0 +1,21 @@
+{
+    "SBS_config"         : 4,
+    "SBS_magnet_percent" : 50,
+    "target_type"        : "LD2",
+    "model"              : 0,
+    "HCALheight_offset"  : 0,
+    "rootfiles"          : "/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/sbs4_elas_sbs50p_imac/qelas/replayed_gmn_SBS4_QE_0.root",
+    "beam_current"       : 1.0E-6,
+    "ngen_total"         : 100000,
+    "global_cut"         : "bb.tr.n==1&&bb.ps.e>0.2&&abs(bb.tr.vz[0])<.08&&bb.gem.track.nhits>3&&abs(bb.etot_over_p-0.92)<0.2&&bb.ps.e+bb.sh.e>1.7&&sbs.hcal.e>0.025",
+    "W_min"              : 0.7,
+    "W_max"              : 1.12,
+    "dpel_min"           : -0.033,
+    "dpel_max"           : 0.016
+}
+
+
+# Different modes of calculation. Goal is to achieve the best resolution
+# model = 0 => using reconstructed p as independent variable
+# model = 1 => using reconstructed angles as independent variable
+
