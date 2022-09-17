@@ -2,7 +2,7 @@
 #define EXP_CONSTANTS_H
 
 #include "TMath.h"
-#include "SBSconfig.h"
+// #include "SBSconfig.h"
 
 namespace expconst {
 
@@ -34,15 +34,12 @@ namespace expconst {
   static const double Alrho = 2.7; //g/cc
 
   // Following quantities vary with configuration
-  double ebeam(int config);  //GeV
-  double bbtheta(int config);  //deg
-  double bbdist(int config);  //m
+  double ebeam(int config);     //GeV
+  double bbtheta(int config);   //deg
+  double bbdist(int config);    //m
   double sbstheta(int config);  //deg
-  double sbsdist(int config);  //m
+  double sbsdist(int config);   //m
   double hcaldist(int config);  //m
-
-  // Load a sbsconfig object with relevant parameters
-  void LoadSBSconfig(int conf, int sbsmag, SBSconfig_t &sbsconf);
 }
 
 #endif

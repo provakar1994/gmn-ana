@@ -15,11 +15,7 @@
 #include "TTreeFormula.h"
 #include "TLorentzVector.h"
 
-#include "../../../include/Constants.h"  // namespace constant
-#include "../../../src/SetROOTVar.cpp"   // namespace setrootvar
-#include "../../../src/ExpConstants.cpp" // namespace expconst
-#include "../../../src/KinematicVar.cpp" // namespace kine
-
+#include "../../../include/gmn-ana.h"
 #include "../../../dflay/src/JSONManager.cxx"
 
 double pi = constant::pi;
@@ -41,8 +37,7 @@ int hcal_det_effi_simu(const char *configfilename,
   // seting up the desired SBS configuration
   int conf = jmgr->GetValueFromKey<int>("SBS_config");
   int sbsmag = jmgr->GetValueFromKey<int>("SBS_magnet_percent");
-  SBSconfig sbsconf;
-  expconst::LoadSBSconfig(conf, sbsmag, sbsconf);
+  SBSconfig sbsconf(conf, sbsmag);
   sbsconf.Print();
 
   // Choosing the model of calculation
@@ -123,7 +118,7 @@ int hcal_det_effi_simu(const char *configfilename,
 
   // defining the outputfile
   std::string outFile = Form("%s_sbs%d_sbs%dp_model%d_simu.root", 
-			     filebase.c_str(), sbsconf.sbsconf, sbsconf.sbsmag, model);
+			     filebase.c_str(), sbsconf.GetSBSconf(), sbsconf.GetSBSmag(), model);
   TFile *fout = new TFile(outFile.c_str(), "RECREATE");
 
   // defining histograms
@@ -138,7 +133,7 @@ int hcal_det_effi_simu(const char *configfilename,
   vector<TVector3> HCAL_axes;
   kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
   double HCALheight_offset = jmgr->GetValueFromKey<double>("HCALheight_offset");
-  TVector3 HCAL_origin = sbsconf.HCALdist*HCAL_axes[2] + HCALheight_offset*HCAL_axes[0];  
+  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + HCALheight_offset*HCAL_axes[0];  
 
   // looping through the tree ---------------------------------------
   long nevent = 0, nevents = C->GetEntries(); 

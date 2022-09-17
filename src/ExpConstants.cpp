@@ -108,18 +108,7 @@ namespace expconst {
       return -1;
     }
   }
-  //--------------------------------------------
-  void LoadSBSconfig(int conf, int sbsmag, SBSconfig_t &sbsconf) {
-    sbsconf.sbsconf       = conf;
-    sbsconf.sbsmag        = sbsmag;
-    sbsconf.Ebeam         = expconst::ebeam(conf);
-    sbsconf.BBtheta       = expconst::bbtheta(conf);
-    sbsconf.BBtheta_rad   = expconst::bbtheta(conf)*TMath::DegToRad();
-    sbsconf.BBdist        = expconst::bbdist(conf);
-    sbsconf.SBStheta_rad  = expconst::sbstheta(conf)*TMath::DegToRad();
-    sbsconf.SBSdist       = expconst::sbsdist(conf);
-    sbsconf.HCALdist      = expconst::hcaldist(conf);
-  }
+
 } //::expconst
 
 
