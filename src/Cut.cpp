@@ -1,0 +1,94 @@
+#include "../include/Cut.h"
+
+namespace cut {
+
+  std::vector<double> hcal_active_area_simu (int nBlk_x=1., int nBlk_y=1.) {
+    // defines the active area of HCAL using simulation DB
+    // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
+    std::vector<double> active_area;
+    // block positions from DB
+    double xHCAL_t_DB = -2.27563; //m, center of top blocks (from DB)
+    double xHCAL_b_DB = 1.37562;  //m, center of bottom blocks (from DB)
+    double yHCAL_r_DB = -0.85217; //m, center of right most blocks (from DB)
+    double yHCAL_l_DB = 0.85217;  //m, center of left most blocks (from DB)
+    // calculate cut limits
+    double xHCAL_t = (xHCAL_t_DB + (expconst::hcalblk_h/2.) + expconst::hcalblk_gap_v) + (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double xHCAL_b = (xHCAL_b_DB - (expconst::hcalblk_h/2.) - expconst::hcalblk_gap_v) - (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double yHCAL_r = (yHCAL_r_DB + (expconst::hcalblk_w/2.) + expconst::hcalblk_gap_h) + (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    double yHCAL_l = (yHCAL_l_DB - (expconst::hcalblk_w/2.) - expconst::hcalblk_gap_h) - (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    active_area.push_back( xHCAL_t ); 
+    active_area.push_back( xHCAL_b );
+    active_area.push_back( xHCAL_r );
+    active_area.push_back( xHCAL_l );
+    return active_area;
+  }
+  //___________________________________________________________________
+  std::vector<double> hcal_active_area_data (int nBlk_x=1., int nBlk_y=1.) {
+    // defines the active area of HCAL using real data DB
+    // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
+    std::vector<double> active_area;
+    // block positions from DB
+    double xHCAL_t_DB = -2.190625; //m, center of top blocks (from DB)
+    double xHCAL_b_DB = 1.460625;  //m, center of bottom blocks (from DB)
+    double yHCAL_r_DB = -0.85217;  //m, center of right most blocks (from DB)
+    double yHCAL_l_DB = 0.85217;   //m, center of left most blocks (from DB)
+    // calculate cut limits
+    double xHCAL_t = (xHCAL_t_DB + (expconst::hcalblk_h/2.) + expconst::hcalblk_gap_v) + (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double xHCAL_b = (xHCAL_b_DB - (expconst::hcalblk_h/2.) - expconst::hcalblk_gap_v) - (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double yHCAL_r = (yHCAL_r_DB + (expconst::hcalblk_w/2.) + expconst::hcalblk_gap_h) + (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    double yHCAL_l = (yHCAL_l_DB - (expconst::hcalblk_w/2.) - expconst::hcalblk_gap_h) - (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    active_area.push_back( xHCAL_t ); 
+    active_area.push_back( xHCAL_b );
+    active_area.push_back( xHCAL_r );
+    active_area.push_back( xHCAL_l );
+    return active_area;
+  }
+  //___________________________________________________________________
+  bool inHCAL_activeA (double xHCAL, double yHCAL, std::vector<double> hcal_active_area) {
+    // returns "True" if nucleon pos. in HCAL is within active area 
+    bool isActive = false;
+    // active area dimensions
+    double xHCAL_t = hcal_active_area[0];
+    double xHCAL_b = hcal_active_area[1];
+    double yHCAL_r = hcal_active_area[2];
+    double yHCAL_l = hcal_active_area[3];
+    isActive = yHCAL>yHCAL_r && yHCAL<yHCAL_l && xHCAL>xHCAL_t && xHCAL<xHCAL_b;
+    return isActive;
+  } 
+  //___________________________________________________________________
+  std::vector<double> hcal_safety_margin (double delx_sigma, double dely_sigma, std::vector<double> hcal_active_area) {
+    // returns co-ordinates for the safety margin of HCAL using HCAL active area
+    std::vector<double> safety_margin;
+    double xHCAL_t = hcal_active_area[0] + delx_sigma;  // top margin
+    double xHCAL_b = hcal_active_area[1] - delx_sigma;  // bottom margin
+    double yHCAL_r = hcal_active_area[2] + dely_sigma;  // right margin
+    double yHCAL_l = hcal_active_area[3] - dely_sigma;  // left margin
+    safety_margin.push_back( xHCAL_t ); 
+    safety_margin.push_back( xHCAL_b );
+    safety_margin.push_back( xHCAL_r );
+    safety_margin.push_back( xHCAL_l );
+    return safety_margin;
+  }
+  //___________________________________________________________________
+  bool inHCAL_fiducial (double xHCAL_exp, double yHCAL_exp, double delx_shift, vector<double> hcal_safety_margin) {
+    // returns "True" if expected nucleon pos. in HCAL is within "Fiducial" region
+    bool isFidu = false;
+    // active area dimensions
+    double xHCAL_t = hcal_safety_margin[0];
+    double xHCAL_b = hcal_safety_margin[1];
+    double yHCAL_r = hcal_safety_margin[2];
+    double yHCAL_l = hcal_safety_margin[3];
+    // first check whether neutrons are in fiducial region or not
+    isFidu_n = yHCAL_exp>yHCAL_r && yHCAL_exp<yHCAL_l && xHCAL_exp>xHCAL_t && xHCAL_exp<xHCAL_b;
+
+    // Now, check whether the protons are in fiducial region or not
+    // calculate expected xHCAL_exp for proton [considering SBS magnet kick]
+    double xHCAL_exp_p = xHCAL_exp - delx_shift;  // "-" sign implies protons are upbending
+    isFidu_p = yHCAL_exp>yHCAL_r && yHCAL_exp<yHCAL_l && xHCAL_exp_p>xHCAL_t && xHCAL_exp_p<xHCAL_b;
+
+    // We return "True" if both isFidu_n and isFidu_p satisfies
+    isFidu = isFidu_n && isFidu_p;
+    return isFidu;
+  } 
+
+}
