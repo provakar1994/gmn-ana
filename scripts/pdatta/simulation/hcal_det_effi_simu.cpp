@@ -217,13 +217,23 @@ int hcal_det_effi_simu(const char *configfilename,
       h_W->Fill(Wrecon);
       double dpel = Peprime.E()/pcentral - 1.0;
 
+      //HCAL active area and safety margin cuts
+      vector<double> hcal_active_area = cut::hcal_active_area_simu(); // Exc. 1 blk from all 4 sides
+      vector<double> hcal_safety_margin = cut::hcal_safety_margin(0.3, 0.2, hcal_active_area);
+
+      // if (inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)); //do stuff
+      // if (inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], delx_shift, hcal_safety_margin)); //do stuff
+
+      cout << hcal_active_area[0] << " " << hcal_safety_margin[0] << endl;
+      
+
     } // if passedgCut
     
   } // while event loop
   std::cout << std::endl;
 
   fout->Write();
-  
+
   delete jmgr;
   return 0;
 }
