@@ -1,26 +1,28 @@
 ## Configure G4SBS for gmn (Q^2 = 3 GeV^2) SBS4 zero field
-#/g4sbs/filename        tout/gmn_sbs4_ngun.root   ## Output rootfile
+#/g4sbs/filename        tout/gmn_sbs4_pgun_30.8_33_166_188.root   ## Output rootfile
 
 ## Configure Experiment
 /g4sbs/exp             gmn
 
 ## Configure the target
 /g4sbs/target          LD2
-/g4sbs/targlen         15.0 cm           ## Target Length
-/g4sbs/rasterx 	       2.0 mm  #raster size in X
-/g4sbs/rastery	       2.0 mm  #raster size in Y
+/g4sbs/targlen         0.01 mm  ## Target Length
+/g4sbs/rasterx 	       0.01 mm   #raster size in X
+/g4sbs/rastery	       0.01 mm   #raster size in Y
 
 ## Configure generator settings
 /g4sbs/kine            gun           ## Generator
-/g4sbs/particle	       neutron
+/g4sbs/particle	       proton
 /g4sbs/gunpol	       1 0 0
 /g4sbs/runtime         1.0 s
 /g4sbs/beamcur         1.0 muA
 /g4sbs/beamE           3.7283 GeV
-/g4sbs/thmin           27.0 deg
-/g4sbs/thmax           37.0 deg
-/g4sbs/phmin           153 deg
-/g4sbs/phmax           210 deg
+/g4sbs/thmin           30.8 deg
+/g4sbs/thmax           33.0 deg
+/g4sbs/phmin           166 deg
+/g4sbs/phmax           188 deg
+/g4sbs/eemin	       1 GeV
+/g4sbs/eemax	       9 GeV
 
 ## Configure standard detector settings
 /g4sbs/hcaldist        11.0 m
@@ -29,11 +31,11 @@
 /g4sbs/sbsclampopt     3                 ## Front field clamp only
 
 ## Configure the magnets
-/g4sbs/bbfield         1
+/g4sbs/bbfield         0
 /g4sbs/scalebbfield    0.9672
 #/g4sbs/tosfield        GMN13_field_newheader.table
 /g4sbs/sbsmagfield     0. tesla
-/g4sbs/48d48field      1
+/g4sbs/48d48field      0
 /g4sbs/bbang           36.0 deg
 /g4sbs/bbdist          1.80 m
 /g4sbs/sbsang          31.9 deg
@@ -45,4 +47,4 @@
 
 ## Run 100 events
 #/g4sbs/eventstatusevery 100
-#/g4sbs/run              1000
+#/g4sbs/run              3000
