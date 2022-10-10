@@ -1,0 +1,10 @@
+{
+    "Ntype"              : "p",
+    "SBS_config"         : 4,
+    "SBS_magnet_percent" : 0,
+    "target_type"        : "LD2",
+    "HCALheight_offset"  : 0,
+    "rootfiles"          : "/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/gmng4_pgun/replayed*",
+    "beam_current"       : 1.0E-6,
+    "global_cut"         : "MC.mc_ep>2&&MC.mc_ep<3"
+}
