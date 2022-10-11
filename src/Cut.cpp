@@ -7,8 +7,8 @@ namespace cut {
     // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
     std::vector<double> active_area;
     // block positions from DB
-    double xHCAL_t_DB = -2.27563; //m, center of top blocks (from DB)
-    double xHCAL_b_DB = 1.37562;  //m, center of bottom blocks (from DB)
+    double xHCAL_t_DB = -2.27563; //m, center of top row blocks (from DB)
+    double xHCAL_b_DB = 1.37562;  //m, center of bottom row blocks (from DB)
     double yHCAL_r_DB = -0.85217; //m, center of right most blocks (from DB)
     double yHCAL_l_DB = 0.85217;  //m, center of left most blocks (from DB)
     // calculate cut limits
@@ -25,11 +25,11 @@ namespace cut {
   //___________________________________________________________________
   std::vector<double> hcal_active_area_data (int nBlk_x=1., int nBlk_y=1.) {
     // defines the active area of HCAL using real data DB
-    // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
+    // indiv. block pos. can be found at SBS-replay/DB/db_sbs.hcal.dat
     std::vector<double> active_area;
     // block positions from DB
-    double xHCAL_t_DB = -2.190625; //m, center of top blocks (from DB)
-    double xHCAL_b_DB = 1.460625;  //m, center of bottom blocks (from DB)
+    double xHCAL_t_DB = -2.190625; //m, center of top row blocks (from DB)
+    double xHCAL_b_DB = 1.460625;  //m, center of bottom row blocks (from DB)
     double yHCAL_r_DB = -0.85217;  //m, center of right most blocks (from DB)
     double yHCAL_l_DB = 0.85217;   //m, center of left most blocks (from DB)
     // calculate cut limits
