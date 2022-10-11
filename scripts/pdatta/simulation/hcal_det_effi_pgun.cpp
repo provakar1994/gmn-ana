@@ -106,8 +106,7 @@ int hcal_det_effi_pgun(const char *configfilename,
       treenum = currenttreenum;
       GlobalCut->UpdateFormulaLeaves();
     } 
-    bool passedgCut = GlobalCut->EvalInstance(0) != 0;
-    
+    bool passedgCut = GlobalCut->EvalInstance(0) != 0;   
     if (passedgCut) {
 
       // constructing q-vector
@@ -120,9 +119,9 @@ int hcal_det_effi_pgun(const char *configfilename,
       vector<double> xyHCAL_exp; 
       kine::GetxyHCALexpect(vertex, pNhat, HCAL_origin, HCAL_axes, xyHCAL_exp);
 
-      //HCAL active area cut
+      // HCAL active area cut
       vector<double> hcal_active_area = cut::hcal_active_area_simu(); // Exc. 1 blk from all 4 sides
-      if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue;     
+      // if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue; // Introduces bias!!   
       if (!cut::inHCAL_activeA(xyHCAL_exp[0], xyHCAL_exp[1], hcal_active_area)) continue; 
 
       T_eHCAL = eHCAL;
