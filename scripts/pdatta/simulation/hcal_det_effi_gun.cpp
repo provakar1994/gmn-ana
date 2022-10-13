@@ -22,7 +22,7 @@ double pi = constant::pi;
 double Mp = constant::Mp;
 double Mn = constant::Mn;
 
-int hcal_det_effi_pgun(const char *configfilename, 
+int hcal_det_effi_gun(const char *configfilename, 
 		       std::string filebase="siout/hcal_det_effi")
 {
 
