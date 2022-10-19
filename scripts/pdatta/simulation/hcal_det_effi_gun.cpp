@@ -27,10 +27,8 @@ double Mn = constant::Mn;
 
 TH1D* MakeHisto(int, int, double, double, std::string);
 
-int hcal_det_effi_gun(const char *configfilename, 
-		      std::string filebase="siout/hcal_det_effi")
+int hcal_det_effi_gun(const char *configfilename, std::string filebase="siout/hcal_det_effi")
 {
-
   // reading input config file ---------------------------------------
   JSONManager *jmgr = new JSONManager(configfilename);
 
