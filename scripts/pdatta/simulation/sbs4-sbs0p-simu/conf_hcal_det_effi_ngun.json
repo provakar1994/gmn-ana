@@ -2,9 +2,11 @@
     "Ntype"              : "n",
     "SBS_config"         : 4,
     "SBS_magnet_percent" : 0,
-    "target_type"        : "LD2",
     "HCALheight_offset"  : 0,
     "rootfiles"          : "/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/gmng4_ngun/replayed*",
-    "beam_current"       : 1.0E-6,
-    "global_cut"         : "MC.mc_ep>2&&MC.mc_ep<3"
+    "h_eHCAL_lims"       : [220, 0, 2.2],
+    "h_pN_lims"          : [80, 1, 9],
+    "global_cut"         : ""
 }
+
+# This is a config file for hcal_det_effi_gun.cpp script. Use while analyzing neutrons.
