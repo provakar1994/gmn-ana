@@ -21,10 +21,6 @@
 #include "../../../include/gmn-ana.h"
 #include "../../../dflay/src/JSONManager.cxx"
 
-double pi = constant::pi;
-double Mp = constant::Mp;
-double Mn = constant::Mn;
-
 TH1D* MakeHisto(int, int, double, double, std::string);
 
 int hcal_det_effi_gun(const char *configfilename, std::string filebase="siout/hcal_det_effi")
