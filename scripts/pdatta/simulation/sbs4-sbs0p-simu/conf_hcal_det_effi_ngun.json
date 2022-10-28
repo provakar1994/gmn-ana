@@ -2,7 +2,6 @@
     "Ntype"              : "n",
     "SBS_config"         : 4,
     "SBS_magnet_percent" : 0,
-    "HCALheight_offset"  : 0,
     "rootfiles"          : "/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/gmng4_ngun/replayed*",
     "h_eHCAL_lims"       : [220, 0, 2.2],
     "h_pN_lims"          : [80, 1, 9],

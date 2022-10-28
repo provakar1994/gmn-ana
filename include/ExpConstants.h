@@ -7,20 +7,24 @@
 namespace expconst {
 
   // Detector variables
-  // bbcal
+  // BBCAL
   static const int shcol = 7;
   static const int shrow = 27;
   static const int pscol = 2;
   static const int psrow = 26;
-  // hcal [dimesions found from g4sbs: G4SBSHArmBuilder::MakeHCALV2]
+  // HCAL [dimesions found from g4sbs: G4SBSHArmBuilder::MakeHCALV2]
   static const int hcalcol = 12;
   static const int hcalrow = 24;
-  static const double hcalblk_w = 0.1524;       //m, width of a HCAL block
-  static const double hcalblk_h = 0.1524;       //m, height of a HCAL block
-  static const double hcalblk_cTc_h = 0.15494;  //m, horizontal center-to-center dist.
-  static const double hcalblk_cTc_v = 0.15875;  //m, vertical center-to-center dist.
-  static const double hcalblk_gap_h = 0.00254;  //m, horiz. gap bet. two blocks
-  static const double hcalblk_gap_v = 0.00635;  //m, vert. gap bet. two blocks
+  static const double hcalblk_w = 0.1524;        //m, width of a HCAL block
+  static const double hcalblk_h = 0.1524;        //m, height of a HCAL block
+  static const double hcalblk_cTc_h = 0.15494;   //m, horizontal center-to-center dist.
+  static const double hcalblk_cTc_v = 0.15875;   //m, vertical center-to-center dist.
+  static const double hcalblk_gap_h = 0.00254;   //m, horiz. gap bet. two blocks
+  static const double hcalblk_gap_v = 0.00635;   //m, vert. gap bet. two blocks
+  static const double hcaloffset_v_data = -0.38; //m, vert. offset of HCAL origin w.r.t DB (data)
+  static const double hcaloffset_h_data = 0.15;  //m, horiz. offset of HCAL origin w.r.t DB (data)
+  static const double hcaloffset_v_simu = 0.0;   //m, vert. offset of HCAL origin w.r.t DB (simu)
+  static const double hcaloffset_h_simu = 0.0;   //m, horiz. offset of HCAL origin w.r.t DB (simu)
   
   // Constant for the entire experiment
   // target

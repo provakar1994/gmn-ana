@@ -5,9 +5,9 @@ namespace kine {
   //--------------------------------------------
   double pcentral(double ebeam, double etheta, std::string Ntype) {
     double temp = 0.;
-    if (Ntype.compare("p")) 
+    if (Ntype.compare("p") == 0) 
       temp = ebeam/(1. + (ebeam/constant::Mp)*(1.0 - cos(etheta)));
-    else if (Ntype.compare("n")) 
+    else if (Ntype.compare("n") == 0) 
       temp = ebeam/(1. + (ebeam/constant::Mn)*(1.0 - cos(etheta)));
     else
       std::cerr << "[KinematicVar::pcentral] Enter a valid nucleon type! **!**" << std::endl;
@@ -23,18 +23,18 @@ namespace kine {
   }
   //--------------------------------------------
   void SetPN(std::string Ntype, TLorentzVector &PN) {
-    if (Ntype.compare("p")) 
+    if (Ntype.compare("p") == 0) 
       PN.SetPxPyPzE(0., 0., 0., constant::Mp);
-    else if (Ntype.compare("n")) 
+    else if (Ntype.compare("n") == 0) 
       PN.SetPxPyPzE(0., 0., 0., constant::Mn);
     else
       std::cerr << "[KinematicVar::pcentral] Enter a valid nucleon type! **!**" << std::endl;
   } 
   //--------------------------------------------
   double pN_expect(double nu, std::string Ntype) {
-    if (Ntype.compare("p"))                      
+    if (Ntype.compare("p") == 0)                      
       return sqrt(pow(nu, 2.) + 2. * constant::Mp * nu);
-    else if (Ntype.compare("n"))      
+    else if (Ntype.compare("n") == 0)      
       return sqrt(pow(nu, 2.) + 2. * constant::Mn * nu);
     else {
       std::cerr << "[KinematicVar::pN_expect] Enter a valid nucleon type! **!**" << std::endl;
@@ -55,6 +55,25 @@ namespace kine {
     HCAL_axes.push_back(HCAL_xaxis);
     HCAL_axes.push_back(HCAL_yaxis);
     HCAL_axes.push_back(HCAL_zaxis);
+  }
+  //--------------------------------------------
+  TVector3 HCALOriginOffset(vector<TVector3> HCAL_axes, std::string dataOrsimu) {
+    /* Calculates HCAL origin offset vector: A vector pointing from HCAL center 
+       defined by DB xpos and ypos to real HCAL origin.
+       input:
+       1. HCAL_axes    : HCAL CoS axes [in Hall CoS]
+       2. dataOrsimu   : Choose "Data" or "Simulation". Required since block positions are slightly 
+                         different in data and simulation DBs.
+    */
+    if (dataOrsimu.compare("data") == 0)
+      return expconst::hcaloffset_v_data*HCAL_axes[0] + expconst::hcaloffset_h_data*HCAL_axes[1];
+    else if (dataOrsimu.compare("simu") == 0)
+      return expconst::hcaloffset_v_simu*HCAL_axes[0] + expconst::hcaloffset_h_simu*HCAL_axes[1];
+    else {
+      std::cerr << "[KinematicVar::HCALOriginOffset] Enter a valid analysis type! **!**" << std::endl;
+      TVector3 err(-1000,-1000,-1000);
+      return err;
+    }
   }
   //--------------------------------------------
   void GetxyHCALexpect(TVector3 vertex, TVector3 pNhat, TVector3 HCAL_origin, 
@@ -87,9 +106,9 @@ namespace kine {
   //--------------------------------------------
   double W2(double ebeam, double eeprime, double Q2, std::string Ntype) {
     double temp = 0.;
-    if (Ntype.compare("p")) 
+    if (Ntype.compare("p") == 0) 
       temp = pow(constant::Mp,2.0) + 2.0*constant::Mp*(ebeam-eeprime) - Q2;
-    else if (Ntype.compare("n")) 
+    else if (Ntype.compare("n") == 0) 
       temp = pow(constant::Mn,2.0) + 2.0*constant::Mn*(ebeam-eeprime) - Q2;
     else
       std::cerr << "[KinematicVar::W2] Enter a valid nucleon type! **!**" << std::endl;
@@ -102,9 +121,9 @@ namespace kine {
   //--------------------------------------------
   double Luminosity(double ibeam, std::string targetType) {
     double lumi = 0.;
-    if (targetType.compare("LH2"))
+    if (targetType.compare("LH2") == 0)
       lumi = ((ibeam/constant::qe)*expconst::tarlen*expconst::lh2tarrho*(constant::N_A/constant::D2_Amass));
-    else if (targetType.compare("LD2"))
+    else if (targetType.compare("LD2") == 0)
       lumi = ((ibeam/constant::qe)*expconst::tarlen*expconst::ld2tarrho*(constant::N_A/constant::D2_Amass));
     else
       std::cerr << "[KinematicVar::Luminosity] Enter a valid target type! **!**" << std::endl;

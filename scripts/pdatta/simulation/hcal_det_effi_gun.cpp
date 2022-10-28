@@ -91,8 +91,7 @@ int hcal_det_effi_gun(const char *configfilename, std::string filebase="siout/hc
   // costruct axes of HCAL CoS in Hall CoS
   vector<TVector3> HCAL_axes;
   kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
-  double HCALheight_offset = jmgr->GetValueFromKey<double>("HCALheight_offset");
-  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + HCALheight_offset*HCAL_axes[0];  
+  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "simu");  
 
   // define the histograms
   TH1D *h_eHCAL_array[int(h_pN_lims[0])];

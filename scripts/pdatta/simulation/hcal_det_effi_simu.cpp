@@ -132,8 +132,7 @@ int hcal_det_effi_simu(const char *configfilename,
   // costruct axes of HCAL CoS in Hall CoS
   vector<TVector3> HCAL_axes;
   kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
-  double HCALheight_offset = jmgr->GetValueFromKey<double>("HCALheight_offset");
-  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + HCALheight_offset*HCAL_axes[0];  
+  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "simu");    
 
   // looping through the tree ---------------------------------------
   long nevent = 0, nevents = C->GetEntries(); 

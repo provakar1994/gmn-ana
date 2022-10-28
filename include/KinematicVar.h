@@ -38,6 +38,11 @@ namespace kine{
   void SetHCALaxes(double sbstheta_rad,           // SBS angle (rad)
 		   vector<TVector3> &HCAL_axes);  // HCAL axes in order: X, Y, Z (Output)
 
+  // Returns HCAL origin offset vector: A vector pointing from HCAL center 
+  // defined by DB xpos and ypos to real HCAL origin.
+  TVector3 HCALOriginOffset(vector<TVector3> HCAL_axes, // HCAL CoS axes [in Hall CoS]
+			    std::string dataOrsimu);    // Flag to choose "Data" or "Simu"
+
   // Get the expected vertical (x) and horizontal (y) positions of the recoil 
   // nucleon at the face of HCAL.
   void GetxyHCALexpect(TVector3 vertex,                 // vertex vector [in Hall CoS]
