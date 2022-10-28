@@ -2,7 +2,6 @@
 #define EXP_CONSTANTS_H
 
 #include "TMath.h"
-// #include "SBSconfig.h"
 
 namespace expconst {
 
