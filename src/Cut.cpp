@@ -7,15 +7,15 @@ namespace cut {
     // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
     std::vector<double> active_area;
     // block positions from DB
-    double xHCAL_t_DB = -2.27563; //m, center of top row blocks (from DB)
-    double xHCAL_b_DB = 1.37562;  //m, center of bottom row blocks (from DB)
-    double yHCAL_r_DB = -0.85217; //m, center of right most blocks (from DB)
-    double yHCAL_l_DB = 0.85217;  //m, center of left most blocks (from DB)
+    double xHCAL_t_DB_MC = expconst::xHCAL_t_DB_MC;  //m, center of top row blocks (from DB)
+    double xHCAL_b_DB_MC = expconst::xHCAL_b_DB_MC;  //m, center of bottom row blocks (from DB)
+    double yHCAL_r_DB_MC = expconst::yHCAL_r_DB_MC;  //m, center of right most blocks (from DB)
+    double yHCAL_l_DB_MC = expconst::yHCAL_l_DB_MC;  //m, center of left most blocks (from DB)
     // calculate cut limits
-    double xHCAL_t = (xHCAL_t_DB + (expconst::hcalblk_h/2.) + expconst::hcalblk_gap_v) + (nBlk_x - 1) * expconst::hcalblk_cTc_v;
-    double xHCAL_b = (xHCAL_b_DB - (expconst::hcalblk_h/2.) - expconst::hcalblk_gap_v) - (nBlk_x - 1) * expconst::hcalblk_cTc_v;
-    double yHCAL_r = (yHCAL_r_DB + (expconst::hcalblk_w/2.) + expconst::hcalblk_gap_h) + (nBlk_y - 1) * expconst::hcalblk_cTc_h;
-    double yHCAL_l = (yHCAL_l_DB - (expconst::hcalblk_w/2.) - expconst::hcalblk_gap_h) - (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    double xHCAL_t = (xHCAL_t_DB_MC + (expconst::hcalblk_h/2.) + expconst::hcalblk_gap_v) + (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double xHCAL_b = (xHCAL_b_DB_MC - (expconst::hcalblk_h/2.) - expconst::hcalblk_gap_v) - (nBlk_x - 1) * expconst::hcalblk_cTc_v;
+    double yHCAL_r = (yHCAL_r_DB_MC + (expconst::hcalblk_w/2.) + expconst::hcalblk_gap_h) + (nBlk_y - 1) * expconst::hcalblk_cTc_h;
+    double yHCAL_l = (yHCAL_l_DB_MC - (expconst::hcalblk_w/2.) - expconst::hcalblk_gap_h) - (nBlk_y - 1) * expconst::hcalblk_cTc_h;
     active_area.push_back( xHCAL_t ); 
     active_area.push_back( xHCAL_b );
     active_area.push_back( yHCAL_r );
@@ -28,10 +28,10 @@ namespace cut {
     // indiv. block pos. can be found at SBS-replay/DB/db_sbs.hcal.dat
     std::vector<double> active_area;
     // block positions from DB
-    double xHCAL_t_DB = -2.190625; //m, center of top row blocks (from DB)
-    double xHCAL_b_DB = 1.460625;  //m, center of bottom row blocks (from DB)
-    double yHCAL_r_DB = -0.85217;  //m, center of right most blocks (from DB)
-    double yHCAL_l_DB = 0.85217;   //m, center of left most blocks (from DB)
+    double xHCAL_t_DB = expconst::xHCAL_t_DB;   //m, center of top row blocks (from DB)
+    double xHCAL_b_DB = expconst::xHCAL_b_DB;   //m, center of bottom row blocks (from DB)
+    double yHCAL_r_DB = expconst::yHCAL_r_DB;   //m, center of right most blocks (from DB)
+    double yHCAL_l_DB = expconst::yHCAL_l_DB;   //m, center of left most blocks (from DB)
     // calculate cut limits
     double xHCAL_t = (xHCAL_t_DB + (expconst::hcalblk_h/2.) + expconst::hcalblk_gap_v) + (nBlk_x - 1) * expconst::hcalblk_cTc_v;
     double xHCAL_b = (xHCAL_b_DB - (expconst::hcalblk_h/2.) - expconst::hcalblk_gap_v) - (nBlk_x - 1) * expconst::hcalblk_cTc_v;

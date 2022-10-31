@@ -12,15 +12,27 @@ namespace expconst {
   static const int shrow = 27;
   static const int pscol = 2;
   static const int psrow = 26;
-  // HCAL [dimesions found from g4sbs: G4SBSHArmBuilder::MakeHCALV2]
+  // HCAL 
+  // 1. dimesions found from g4sbs: G4SBSHArmBuilder::MakeHCALV2
   static const int hcalcol = 12;
   static const int hcalrow = 24;
-  static const double hcalblk_w = 0.1524;        //m, width of a HCAL block
-  static const double hcalblk_h = 0.1524;        //m, height of a HCAL block
-  static const double hcalblk_cTc_h = 0.15494;   //m, horizontal center-to-center dist.
-  static const double hcalblk_cTc_v = 0.15875;   //m, vertical center-to-center dist.
-  static const double hcalblk_gap_h = 0.00254;   //m, horiz. gap bet. two blocks
-  static const double hcalblk_gap_v = 0.00635;   //m, vert. gap bet. two blocks
+  static const double hcalblk_w = 0.1524;       //m, width of a HCAL block
+  static const double hcalblk_h = 0.1524;       //m, height of a HCAL block
+  static const double hcalblk_cTc_h = 0.15494;  //m, horizontal center-to-center dist.
+  static const double hcalblk_cTc_v = 0.15875;  //m, vertical center-to-center dist.
+  static const double hcalblk_gap_h = 0.00254;  //m, horiz. gap bet. two blocks
+  static const double hcalblk_gap_v = 0.00635;  //m, vert. gap bet. two blocks
+  // 2. x & y pos of blocks sitting at all 4 edges
+  static const double xHCAL_t_DB = -2.190625;   //m, center of top row blocks (from SBS-replay/DB)
+  static const double xHCAL_b_DB = 1.460625;    //m, center of bottom row blocks (from SBS-replay/DB)
+  static const double yHCAL_r_DB = -0.85217;    //m, center of right most blocks (from SBS-replay/DB)
+  static const double yHCAL_l_DB = 0.85217;     //m, center of left most blocks (from SBS-replay/DB)
+  // --- above => data, below => simu
+  static const double xHCAL_t_DB_MC = -2.27563; //m, center of top row blocks (from SBS-replay/DB_MC)
+  static const double xHCAL_b_DB_MC = 1.37562;  //m, center of bottom row blocks (from SBS-replay/DB_MC)
+  static const double yHCAL_r_DB_MC = -0.85217; //m, center of right most blocks (from SBS-replay/DB_MC)
+  static const double yHCAL_l_DB_MC = 0.85217;  //m, center of left most blocks (from SBS-replay/DB_MC)
+  // 3. Offsets adjusted by looking at deltax and deltay distributions
   static const double hcaloffset_v_data = -0.38; //m, vert. offset of HCAL origin w.r.t DB (data)
   static const double hcaloffset_h_data = 0.15;  //m, horiz. offset of HCAL origin w.r.t DB (data)
   static const double hcaloffset_v_simu = 0.0;   //m, vert. offset of HCAL origin w.r.t DB (simu)
@@ -28,14 +40,12 @@ namespace expconst {
   
   // Constant for the entire experiment
   // target
-  static const double tarlen = 15.0;  //cm
- 
+  static const double tarlen = 15.0;  //cm 
   // LH2
   static const double lh2tarrho = 0.0723;     //g/cc, target density
   static const double lh2cthick = 0.02;       //cm, target cell thickness
   static const double lh2uwallthick = 0.0145; //cm, upstream wall thickness
   static const double lh2dwallthick = 0.015;  //cm, downstream wall thickness
-
   // LD2
   static const double ld2tarrho = 0.169;      //g/cc, target density
 
