@@ -11,8 +11,8 @@
     "dx_p"               : [0.007, 0.087],
     "dy_p"               : [-0.06, 0.056],
     "sbs_kick"           : 0,
-    "Wmin"               : 0.7,
-    "Wmax"               : 1.12
+    "Wmin"               : 0.676,
+    "Wmax"               : 1.076
 }
 
 ## This is a config file for hcal_det_effi_data.cpp script. 

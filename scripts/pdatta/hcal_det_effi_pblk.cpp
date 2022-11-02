@@ -128,6 +128,10 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
   vector<double> hcal_active_area = cut::hcal_active_area_data(); // Exc. 1 blk from all 4 sides
   vector<double> hcal_safety_margin = cut::hcal_safety_margin(dx_p[1], dy_p[1], hcal_active_area);
 
+  // elastic cut limits
+  double Wmin = jmgr->GetValueFromKey<double>("Wmin");
+  double Wmax = jmgr->GetValueFromKey<double>("Wmax");
+
   // costruct axes of HCAL CoS in Hall CoS
   vector<TVector3> HCAL_axes; kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
   TVector3 HCAL_origin; kine::SetHCALorigin(sbsconf.GetHCALdist(), HCAL_axes, "data", HCAL_origin);
@@ -206,7 +210,8 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
     h_dpel->Fill(dpel);
 
     // W cut
-    if (abs(Wrecon - 0.876) > 0.2) continue;
+    if (Wrecon < Wmin || Wrecon > Wmax) continue;
+    //if (abs(Wrecon - 0.876) > 0.2) continue;
 
     // Expected position of the q vector at HCAL
     vector<double> xyHCAL_exp; // xyHCAL_exp[0] = xHCAL_exp & xyHCAL_exp[1] = yHCAL_exp
@@ -255,9 +260,7 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
 
   c1->cd(1); h2_dxdyHCAL->Draw("colz");
   TEllipse Ep;
-  Ep.SetFillStyle(0);
-  Ep.SetLineColor(2);
-  Ep.SetLineWidth(2);
+  Ep.SetFillStyle(0); Ep.SetLineColor(2); Ep.SetLineWidth(2);
   Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut_dy*dy_p[1], Nsigma_cut_dx*dx_p[1], 0,360,0);
  
   c1->cd(2); h2_rcHCAL->Draw("colz");
