@@ -1,0 +1,27 @@
+{
+    "Ntype"              : "p",
+    "SBS_config"         : 8,
+    "SBS_magnet_percent" : 0,
+    "model"              : 1,
+    "rootfile_dir"       : "/w/halla-scshelf2102/sbs/sbs-gmn/pass1/SBS8/LH2/rootfiles",
+    "runnums"            : [13459,13460,13461,13463,13464,13465,13466],
+    "global_cut"         : "bb.tr.n==1&&abs(bb.tr.vz[0])<0.08&&abs(bb.tr.tg_th[0])<0.15&&abs(bb.tr.tg_ph[0])<0.3&&bb.gem.track.nhits>3&&bb.ps.e>0.2",
+    "Nsigma_cut_dx"      : 4,
+    "Nsigma_cut_dy"      : 6,
+    "dx_p"               : [0.007, 0.087],
+    "dy_p"               : [-0.06, 0.056],
+    "sbs_kick"           : 0,
+    "Wmin"               : 0.7,
+    "Wmax"               : 1.12
+}
+
+## This is a config file for hcal_det_effi_data.cpp script. 
+# Help:
+dx_p : deltax dist. of p. dx_p[0] => Peak position, dx_p[1] => Peak RMS
+dy_p : deltay dist. of p. dy_p[0] => Peak position, dy_p[1] => Peak RMS
+Nsigma_cut_dx(dy) : # of sigma to include in the deltax(deltay) cut
+
+
+# Scratch:
+    "dx_p"               : [0.007, 0.087],
+    "dy_p"               : [0.003, 0.056],
