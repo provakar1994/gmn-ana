@@ -1,5 +1,6 @@
 /* 
-   This macro will determine nucleon detection efficiency of HCAL using beam data.
+   This macro calculates the detection efficiency of each HCAL block to identify bad blocks.
+   E.g. Config. File: sbs8-sbs0p/conf_hcal_det_effi_pblk.json
    -----
    P. Datta  Created  09-12-2022 (Based on AJR Puckett's momentum calibration script)
 */
@@ -17,7 +18,7 @@
 #include "../../include/gmn-ana.h"
 #include "../../dflay/src/JSONManager.cxx"
 
-int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/hcal_det_effi")
+int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/hcal_det_effi_pblk")
 {
 
   // reading input config file ---------------------------------------
