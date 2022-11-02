@@ -42,6 +42,11 @@ namespace kine{
   // defined by DB xpos and ypos to real HCAL origin.
   TVector3 HCALOriginOffset(vector<TVector3> HCAL_axes, // HCAL CoS axes [in Hall CoS]
 			    std::string dataOrsimu);    // Flag to choose "data" or "simu"
+  // Constructs HCAL origin vector from vertex in Hall CoS
+  void SetHCALorigin(double sbsdist,                                // SBS distance (m)
+		     vector<TVector3> HCAL_axes,                    // HCAL CoS axes [in Hall CoS]
+		     std::string dataOrsimu,                        // Choose "Data" or "Simulation"
+		     TVector3 &HCAL_origin);                        // Output: HCAL origin vector from vertex
 
   // Get the expected vertical (x) and horizontal (y) positions of the recoil 
   // nucleon at the face of HCAL.

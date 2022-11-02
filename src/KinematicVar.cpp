@@ -75,6 +75,13 @@ namespace kine {
       return err;
     }
   }
+  void SetHCALorigin(double sbsdist,                                // SBS distance (m)
+		     vector<TVector3> HCAL_axes,                    // HCAL CoS axes [in Hall CoS]
+		     std::string dataOrsimu,                        // Choose "Data" or "Simulation"
+		     TVector3 &HCAL_origin) {                       // Output: HCAL origin vector from vertex
+    /* Sets HCAL origin vector from vertex in Hall CoS */
+    HCAL_origin = sbsdist*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, dataOrsimu);    
+  }
   //--------------------------------------------
   void GetxyHCALexpect(TVector3 vertex, TVector3 pNhat, TVector3 HCAL_origin, 
 		       vector<TVector3> HCAL_axes, vector<double> &xyHCALexpect) {

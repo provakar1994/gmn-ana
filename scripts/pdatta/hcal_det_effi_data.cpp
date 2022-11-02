@@ -27,7 +27,7 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   std::string rootfile_dir = jmgr->GetValueFromKey_str("rootfile_dir");
   std::vector<int> runnums; jmgr->GetVectorFromKey<int>("runnums",runnums);
   TChain *C = new TChain("T");
-  //C->Add(rootfile_dir.c_str());
+  // C->Add(rootfile_dir.c_str());
   for (int i=0; i<runnums.size(); i++) {
     std::string rfname = rootfile_dir + Form("/*%d*",runnums[i]);
     C->Add(rfname.c_str());
@@ -90,7 +90,8 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   C->SetBranchStatus("bb.etot_over_p", 1);
 
   // defining the outputfile
-  TString outFile = Form("%s_sbs%d_sbs%dp_model%d_data.root", filebase.c_str(), sbsconf.GetSBSconf(), sbsconf.GetSBSmag(), model);
+  TString outFile = Form("%s_sbs%d_sbs%dp_model%d_data.root", 
+			 filebase.c_str(), sbsconf.GetSBSconf(), sbsconf.GetSBSmag(), model);
   TFile *fout = new TFile(outFile.Data(), "RECREATE");
 
   // defining histograms
@@ -118,15 +119,16 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   // Do the energy loss calculation here ...........
 
   // HCAL cut definitions
-  double Nsigma_cut = jmgr->GetValueFromKey<double>("Nsigma_cut");
+  double Nsigma_cut_dx = jmgr->GetValueFromKey<double>("Nsigma_cut_dx");
+  double Nsigma_cut_dy = jmgr->GetValueFromKey<double>("Nsigma_cut_dy");
   vector<double> dx_p; jmgr->GetVectorFromKey<double>("dx_p", dx_p);
   vector<double> dy_p; jmgr->GetVectorFromKey<double>("dy_p", dy_p);
   double sbs_kick = jmgr->GetValueFromKey<double>("sbs_kick");
 
   // costruct axes of HCAL CoS in Hall CoS
-  vector<TVector3> HCAL_axes;
-  kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
-  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "data");  
+  vector<TVector3> HCAL_axes; kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
+  TVector3 HCAL_origin; kine::SetHCALorigin(sbsconf.GetHCALdist(), HCAL_axes, "data", HCAL_origin);
+  //TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "data");  
 
   // looping through the tree ---------------------------------------
   long nevent = 0, nevents = C->GetEntries(); 
@@ -203,14 +205,12 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
 
     // W cut
     if (abs(Wrecon - 0.876) > 0.2) continue;
-    h2_rcHCAL->Fill(cblkHCAL, rblkHCAL);
 
     // Expected position of the q vector at HCAL
     vector<double> xyHCAL_exp; // xyHCAL_exp[0] = xHCAL_exp & xyHCAL_exp[1] = yHCAL_exp
     kine::GetxyHCALexpect(vertex, pNhat, HCAL_origin, HCAL_axes, xyHCAL_exp);
     double dx = xHCAL - xyHCAL_exp[0];  h_dxHCAL->Fill(dx);
     double dy = yHCAL - xyHCAL_exp[1];  h_dyHCAL->Fill(dy);
-    h2_dxdyHCAL->Fill(dy, dx);
 
     // HCAL active area and safety margin cuts [Fiducial region]
     vector<double> hcal_active_area = cut::hcal_active_area_data(); // Exc. 1 blk from all 4 sides
@@ -218,8 +218,12 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
     if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue; 
     if (!cut::inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], sbs_kick, hcal_safety_margin)) continue; 
 
+    // histos with fiducial cut
+    h2_rcHCAL->Fill(cblkHCAL, rblkHCAL);
+    h2_dxdyHCAL->Fill(dy, dx);
+
     // HCAL cut
-    bool pcut = pow( (dx - dx_p[0])/dx_p[1], 2 ) + pow( (dy - dy_p[0])/dy_p[1], 2 ) <= pow(Nsigma_cut, 2);
+    bool pcut = pow((dx-dx_p[0]) / (dx_p[1]*Nsigma_cut_dx), 2) + pow((dy-dy_p[0]) / (dy_p[1]*Nsigma_cut_dy), 2) <= 1.;
     if (pcut) { 
       h_W_cut->Fill(Wrecon);
       h_effipblk_num->Fill(idblkHCAL, 1);
@@ -254,7 +258,7 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   Ep.SetFillStyle(0);
   Ep.SetLineColor(2);
   Ep.SetLineWidth(2);
-  Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut*dy_p[1], Nsigma_cut*dx_p[1], 0,360,0);
+  Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut_dy*dy_p[1], Nsigma_cut_dx*dx_p[1], 0,360,0);
  
   c1->cd(2); h2_rcHCAL->Draw("colz");
  
