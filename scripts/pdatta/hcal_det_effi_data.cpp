@@ -17,10 +17,6 @@
 #include "../../include/gmn-ana.h"
 #include "../../dflay/src/JSONManager.cxx"
 
-double pi = constant::pi;
-double Mp = constant::Mp;
-double Mn = constant::Mn;
-
 int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/hcal_det_effi")
 {
 
@@ -29,13 +25,13 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
 
   // parsing trees
   std::string rootfile_dir = jmgr->GetValueFromKey_str("rootfile_dir");
-  //std::vector<int> runnums; jmgr->GetVectorFromKey<int>("runnums",runnums);
+  std::vector<int> runnums; jmgr->GetVectorFromKey<int>("runnums",runnums);
   TChain *C = new TChain("T");
-  C->Add(rootfile_dir.c_str());
-  // for (int i=0; i<runnums.size(); i++) {
-  //   std::string rfname = rootfile_dir + Form("/*%d*",runnums[i]);
-  //   C->Add(rfname.c_str());
-  // }
+  //C->Add(rootfile_dir.c_str());
+  for (int i=0; i<runnums.size(); i++) {
+    std::string rfname = rootfile_dir + Form("/*%d*",runnums[i]);
+    C->Add(rfname.c_str());
+  }
 
   // seting up the desired SBS configuration
   int conf = jmgr->GetValueFromKey<int>("SBS_config");
@@ -68,9 +64,9 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   // setrootvar::setbranch(C, "HALLA_p", "", &HALLA_p);
 
   // hcal clus var
-  double eHCAL, xHCAL, yHCAL;
-  std::vector<std::string> hcalclvar = {"e","x","y"};
-  std::vector<void*> hcalclvar_mem = {&eHCAL,&xHCAL,&yHCAL};
+  double eHCAL, xHCAL, yHCAL, rblkHCAL, cblkHCAL, idblkHCAL;
+  std::vector<std::string> hcalclvar = {"e","x","y","rowblk","colblk", "idblk"};
+  std::vector<void*> hcalclvar_mem = {&eHCAL,&xHCAL,&yHCAL,&rblkHCAL,&cblkHCAL,&idblkHCAL};
   setrootvar::setbranch(C, "sbs.hcal", hcalclvar, hcalclvar_mem);
 
   // track var
@@ -94,17 +90,38 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   C->SetBranchStatus("bb.etot_over_p", 1);
 
   // defining the outputfile
-  std::string outFile = Form("%s_sbs%d_sbs%dp_model%d_data.root", filebase.c_str(), sbsconf.GetSBSconf(), sbsconf.GetSBSmag(), model);
-  TFile *fout = new TFile(outFile.c_str(), "RECREATE");
+  TString outFile = Form("%s_sbs%d_sbs%dp_model%d_data.root", filebase.c_str(), sbsconf.GetSBSconf(), sbsconf.GetSBSmag(), model);
+  TFile *fout = new TFile(outFile.Data(), "RECREATE");
 
   // defining histograms
-  TH1D *h_W = new TH1D("h_W",";W (GeV);", 250, 0., 2.);
+  TH1F *h_W = util_pd::TH1FhW("h_W");
+  TH1F *h_W_cut = util_pd::TH1FhW("h_W_cut");
+  TH1F *h_W_acut = util_pd::TH1FhW("h_W_acut");
   TH1D *h_dpel = new TH1D("h_dpel",";p/p_{elastic}(#theta)-1;",250,-0.25,0.25);
   TH1F *h_Q2 = new TH1F("h_Q2", "Q^{2} distribution", 100, 0., 5.);
   TH1F *h_dxHCAL = new TH1F("h_dxHCAL","; x_{HCAL} - x_{exp} (m);", 250, -2.5, 2.5);
   TH1F *h_dyHCAL = new TH1F("h_dyHCAL","; y_{HCAL} - y_{exp} (m);", 250, -1.25, 1.25);
+  TH1F *h_coin_time = new TH1F("h_coin_time", "Coincidence time (ns)", 200, 380, 660);
+
+  TH2F *h2_dxdyHCAL; h2_dxdyHCAL = util_pd::TH2FdxdyHCAL("h2_dxdyHCAL");
+  TH2F *h2_rcHCAL; h2_rcHCAL = util_pd::TH2FHCALface_rc("h2_rcHCAL");
+  TH2F *h2_effipblk_num; h2_effipblk_num = util_pd::TH2FHCALface_rc("h2_effipblk_num");
+  TH2F *h2_effipblk_den; h2_effipblk_den = util_pd::TH2FHCALface_rc("h2_effipblk_den");
+  TH2F *h2_effipblk; h2_effipblk = util_pd::TH2FHCALface_rc("h2_effipblk");
+  TH2F *h2_effipblk_num_xy; h2_effipblk_num_xy = util_pd::TH2FHCALface_xy_data("h2_effipblk_num_xy");
+  TH2F *h2_effipblk_den_xy; h2_effipblk_den_xy = util_pd::TH2FHCALface_xy_data("h2_effipblk_den_xy");
+  TH2F *h2_effipblk_xy; h2_effipblk_xy = util_pd::TH2FHCALface_xy_data("h2_effipblk_xy");
+  TH1F *h_effipblk_num = new TH1F("h_effipblk_num", "Efficiency per HCAL Block : Numerator", 288, 1, 289);
+  TH1F *h_effipblk_den = new TH1F("h_effipblk_den", "Efficiency per HCAL Block : Denominator", 288, 1, 289);
+  TH1F *h_effipblk = new TH1F("h_effipblk", "Efficiency per HCAL Block", 288, 1, 289);
 
   // Do the energy loss calculation here ...........
+
+  // HCAL cut definitions
+  double Nsigma_cut = jmgr->GetValueFromKey<double>("Nsigma_cut");
+  vector<double> dx_p; jmgr->GetVectorFromKey<double>("dx_p", dx_p);
+  vector<double> dy_p; jmgr->GetVectorFromKey<double>("dy_p", dy_p);
+  double sbs_kick = jmgr->GetValueFromKey<double>("sbs_kick");
 
   // costruct axes of HCAL CoS in Hall CoS
   vector<TVector3> HCAL_axes;
@@ -115,6 +132,7 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   long nevent = 0, nevents = C->GetEntries(); 
   int treenum = 0, currenttreenum = 0;
   while (C->GetEntry(nevent++)) {
+   
     // print progress 
     if( nevent % 1000 == 0 ) std::cout << nevent << "/" << nevents << "\r";
     std::cout.flush();
@@ -134,8 +152,7 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
       if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
       if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
     }
-    double coin_time = hcal_time - bbcal_time;
-    //h_coin_time->Fill( coin_time );
+    double coin_time = hcal_time - bbcal_time;  h_coin_time->Fill( coin_time );
     if(fabs(coin_time - 510) > 10.) continue;
 
     // kinematic parameters
@@ -162,7 +179,7 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
     double nu = 0.;                   // energy of the virtual photon
     double pN_expect = 0.;            // expected recoil nucleon momentum
     double thetaN_expect = 0.;        // expected recoil nucleon theta
-    double phiN_expect = ephi + pi; 
+    double phiN_expect = ephi + constant::pi; 
     /* Different modes of calculation. Goal is to achieve the best resolution
        model 0 = uses reconstructed p as independent variable
        model 1 = uses reconstructed angles as independent variable */
@@ -177,7 +194,6 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
     }
     TVector3 pNhat = kine::qVect_unit(thetaN_expect, phiN_expect);
 
-
     double Q2recon = kine::Q2(ebeam_corr, Peprime.E(), etheta);
     h_Q2->Fill(Q2recon); 
     double Wrecon = kine::W(ebeam_corr, Peprime.E(), Q2recon, "p");
@@ -186,33 +202,85 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
     h_dpel->Fill(dpel);
 
     // W cut
-    if (abs(Wrecon - 0.88) > 0.4) continue;
+    if (abs(Wrecon - 0.876) > 0.2) continue;
+    h2_rcHCAL->Fill(cblkHCAL, rblkHCAL);
 
     // Expected position of the q vector at HCAL
     vector<double> xyHCAL_exp; // xyHCAL_exp[0] = xHCAL_exp & xyHCAL_exp[1] = yHCAL_exp
     kine::GetxyHCALexpect(vertex, pNhat, HCAL_origin, HCAL_axes, xyHCAL_exp);
-    h_dxHCAL->Fill(xHCAL - xyHCAL_exp[0]);
-    h_dyHCAL->Fill(yHCAL - xyHCAL_exp[1]);
+    double dx = xHCAL - xyHCAL_exp[0];  h_dxHCAL->Fill(dx);
+    double dy = yHCAL - xyHCAL_exp[1];  h_dyHCAL->Fill(dy);
+    h2_dxdyHCAL->Fill(dy, dx);
 
-    //HCAL active area and safety margin cuts
+    // HCAL active area and safety margin cuts [Fiducial region]
     vector<double> hcal_active_area = cut::hcal_active_area_data(); // Exc. 1 blk from all 4 sides
-    // vector<double> hcal_safety_margin = cut::hcal_safety_margin(delx_sigma, dely_sigma, hcal_active_area);
-    // if (inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)); //do stuff
-    // if (inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], delx_shift, hcal_safety_margin)); //do stuff
+    vector<double> hcal_safety_margin = cut::hcal_safety_margin(dx_p[1], dy_p[1], hcal_active_area);
+    if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue; 
+    if (!cut::inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], sbs_kick, hcal_safety_margin)) continue; 
+
+    // HCAL cut
+    bool pcut = pow( (dx - dx_p[0])/dx_p[1], 2 ) + pow( (dy - dy_p[0])/dy_p[1], 2 ) <= pow(Nsigma_cut, 2);
+    if (pcut) { 
+      h_W_cut->Fill(Wrecon);
+      h_effipblk_num->Fill(idblkHCAL, 1);
+      h2_effipblk_num->Fill(cblkHCAL, rblkHCAL, 1);
+      h2_effipblk_num_xy->Fill(yHCAL, xHCAL, 1);
+      h_effipblk_den->Fill(idblkHCAL, 1);
+      h2_effipblk_den->Fill(cblkHCAL, rblkHCAL, 1);
+      h2_effipblk_den_xy->Fill(yHCAL, xHCAL, 1);
+    } else {
+      h_W_acut->Fill(Wrecon);
+      h_effipblk_den->Fill(idblkHCAL, 1);
+      h2_effipblk_den->Fill(cblkHCAL, rblkHCAL, 1);
+      h2_effipblk_den_xy->Fill(yHCAL, xHCAL, 1);
+    }
 
       
   } // while event loop
   std::cout << std::endl;
 
-  TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
-  c1->Divide(2,1);
-  c1->cd(1); h_dxHCAL->Draw();
-  c1->cd(2); h_dyHCAL->Draw();
-  // c1->cd(1); h_W->Draw();
-  // c1->cd(2); h_dpel->Draw();
+  // calculate efficiencies per HCAL block
+  h_effipblk->Divide(h_effipblk_num, h_effipblk_den);
+  h2_effipblk->Divide(h2_effipblk_num, h2_effipblk_den);
+  h2_effipblk->GetZaxis()->SetRangeUser(0,1);
+  h2_effipblk_xy->Divide(h2_effipblk_num_xy, h2_effipblk_den_xy);
+  h2_effipblk_xy->GetZaxis()->SetRangeUser(0,1);
+
+  TCanvas *c1 = new TCanvas("c1", "c1", 1400, 800);
+  c1->Divide(2,2);
+
+  c1->cd(1); h2_dxdyHCAL->Draw("colz");
+  TEllipse Ep;
+  Ep.SetFillStyle(0);
+  Ep.SetLineColor(2);
+  Ep.SetLineWidth(2);
+  Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut*dy_p[1], Nsigma_cut*dx_p[1], 0,360,0);
+ 
+  c1->cd(2); h2_rcHCAL->Draw("colz");
+ 
+  c1->cd(3); h2_effipblk->Draw("colz");
+
+  c1->cd(4); h2_effipblk_xy->Draw("colz");
+  vector<double> hcal_active_area = cut::hcal_active_area_data();
+  TLine L1h_p;
+  L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
+  L1h_p.DrawLine(hcal_active_area[2],hcal_active_area[1],hcal_active_area[3],hcal_active_area[1]);
+  TLine L2h_p;
+  L2h_p.SetLineColor(2); L2h_p.SetLineWidth(4); L2h_p.SetLineStyle(9);
+  L2h_p.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[3],hcal_active_area[0]);
+  
+  TLine L1v_p;
+  L1v_p.SetLineColor(2); L1v_p.SetLineWidth(4); L1v_p.SetLineStyle(9);
+  L1v_p.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[2],hcal_active_area[1]);
+  TLine L2v_p;
+  L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
+  L2v_p.DrawLine(hcal_active_area[3],hcal_active_area[0],hcal_active_area[3],hcal_active_area[1]);
+
+  //c1->Print(plotsfilename.Data(),"pdf");
+  outFile.ReplaceAll(".root",".png");
+  c1->Print(outFile.Data(),"png");
 
   fout->Write();
-
   delete jmgr;
   return 0;
 }
