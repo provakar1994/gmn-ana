@@ -8,6 +8,9 @@ namespace util_pd {
   //_____________________________________
   TH2F *TH2FHCALface_rc(std::string name) {
     // returns TH2F for HCAL face (row,col)
+    /* NOTE: HCAL block id (ibblk) starts from 1 and goes up to 288 but both
+             HCAL row (rowblk) and column starts from 0 and goes up to 23 and 
+             11, respectively. Extremely annoying! */
     TH2F *h = new TH2F(name.c_str(), ";HCAL columns;HCAL rows",
 		       expconst::hcalcol, 0, expconst::hcalcol,
 		       expconst::hcalrow, 0, expconst::hcalrow);
