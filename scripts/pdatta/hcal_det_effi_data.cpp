@@ -124,11 +124,12 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   vector<double> dx_p; jmgr->GetVectorFromKey<double>("dx_p", dx_p);
   vector<double> dy_p; jmgr->GetVectorFromKey<double>("dy_p", dy_p);
   double sbs_kick = jmgr->GetValueFromKey<double>("sbs_kick");
+  vector<double> hcal_active_area = cut::hcal_active_area_data(); // Exc. 1 blk from all 4 sides
+  vector<double> hcal_safety_margin = cut::hcal_safety_margin(dx_p[1], dy_p[1], hcal_active_area);
 
   // costruct axes of HCAL CoS in Hall CoS
   vector<TVector3> HCAL_axes; kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
   TVector3 HCAL_origin; kine::SetHCALorigin(sbsconf.GetHCALdist(), HCAL_axes, "data", HCAL_origin);
-  //TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "data");  
 
   // looping through the tree ---------------------------------------
   long nevent = 0, nevents = C->GetEntries(); 
@@ -213,8 +214,6 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
     double dy = yHCAL - xyHCAL_exp[1];  h_dyHCAL->Fill(dy);
 
     // HCAL active area and safety margin cuts [Fiducial region]
-    vector<double> hcal_active_area = cut::hcal_active_area_data(); // Exc. 1 blk from all 4 sides
-    vector<double> hcal_safety_margin = cut::hcal_safety_margin(dx_p[1], dy_p[1], hcal_active_area);
     if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue; 
     if (!cut::inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], sbs_kick, hcal_safety_margin)) continue; 
 
@@ -265,14 +264,12 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   c1->cd(3); h2_effipblk->Draw("colz");
 
   c1->cd(4); h2_effipblk_xy->Draw("colz");
-  vector<double> hcal_active_area = cut::hcal_active_area_data();
   TLine L1h_p;
   L1h_p.SetLineColor(2); L1h_p.SetLineWidth(4); L1h_p.SetLineStyle(9);
   L1h_p.DrawLine(hcal_active_area[2],hcal_active_area[1],hcal_active_area[3],hcal_active_area[1]);
   TLine L2h_p;
   L2h_p.SetLineColor(2); L2h_p.SetLineWidth(4); L2h_p.SetLineStyle(9);
   L2h_p.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[3],hcal_active_area[0]);
-  
   TLine L1v_p;
   L1v_p.SetLineColor(2); L1v_p.SetLineWidth(4); L1v_p.SetLineStyle(9);
   L1v_p.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[2],hcal_active_area[1]);
@@ -280,7 +277,6 @@ int hcal_det_effi_data (const char *configfilename, std::string filebase="pdout/
   L2v_p.SetLineColor(2); L2v_p.SetLineWidth(4); L2v_p.SetLineStyle(9);
   L2v_p.DrawLine(hcal_active_area[3],hcal_active_area[0],hcal_active_area[3],hcal_active_area[1]);
 
-  //c1->Print(plotsfilename.Data(),"pdf");
   outFile.ReplaceAll(".root",".png");
   c1->Print(outFile.Data(),"png");
 
