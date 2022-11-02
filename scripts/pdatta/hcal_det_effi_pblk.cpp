@@ -120,8 +120,8 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
   // Do the energy loss calculation here ...........
 
   // HCAL cut definitions
-  double Nsigma_cut_dx = jmgr->GetValueFromKey<double>("Nsigma_cut_dx");
-  double Nsigma_cut_dy = jmgr->GetValueFromKey<double>("Nsigma_cut_dy");
+  double Nsigma_cut_dx_p = jmgr->GetValueFromKey<double>("Nsigma_cut_dx_p");
+  double Nsigma_cut_dy_p = jmgr->GetValueFromKey<double>("Nsigma_cut_dy_p");
   vector<double> dx_p; jmgr->GetVectorFromKey<double>("dx_p", dx_p);
   vector<double> dy_p; jmgr->GetVectorFromKey<double>("dy_p", dy_p);
   double sbs_kick = jmgr->GetValueFromKey<double>("sbs_kick");
@@ -133,8 +133,10 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
   double Wmax = jmgr->GetValueFromKey<double>("Wmax");
 
   // costruct axes of HCAL CoS in Hall CoS
+  double hcal_voffset = jmgr->GetValueFromKey<double>("hcal_voffset");
+  double hcal_hoffset = jmgr->GetValueFromKey<double>("hcal_hoffset");
   vector<TVector3> HCAL_axes; kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
-  TVector3 HCAL_origin; kine::SetHCALorigin(sbsconf.GetHCALdist(), HCAL_axes, "data", HCAL_origin);
+  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + hcal_voffset*HCAL_axes[0] + hcal_hoffset*HCAL_axes[1];
 
   // looping through the tree ---------------------------------------
   long nevent = 0, nevents = C->GetEntries(); 
@@ -228,7 +230,7 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
     h2_dxdyHCAL->Fill(dy, dx);
 
     // HCAL cut
-    bool pcut = pow((dx-dx_p[0]) / (dx_p[1]*Nsigma_cut_dx), 2) + pow((dy-dy_p[0]) / (dy_p[1]*Nsigma_cut_dy), 2) <= 1.;
+    bool pcut = pow((dx-dx_p[0]) / (dx_p[1]*Nsigma_cut_dx_p), 2) + pow((dy-dy_p[0]) / (dy_p[1]*Nsigma_cut_dy_p), 2) <= 1.;
     if (pcut) { 
       h_W_cut->Fill(Wrecon);
       h_effipblk_num->Fill(idblkHCAL, 1);
@@ -261,7 +263,7 @@ int hcal_det_effi_pblk (const char *configfilename, std::string filebase="pdout/
   c1->cd(1); h2_dxdyHCAL->Draw("colz");
   TEllipse Ep;
   Ep.SetFillStyle(0); Ep.SetLineColor(2); Ep.SetLineWidth(2);
-  Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut_dy*dy_p[1], Nsigma_cut_dx*dx_p[1], 0,360,0);
+  Ep.DrawEllipse(dy_p[0], dx_p[0], Nsigma_cut_dy_p*dy_p[1], Nsigma_cut_dx_p*dx_p[1], 0,360,0);
  
   c1->cd(2); h2_rcHCAL->Draw("colz");
  

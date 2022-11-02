@@ -89,9 +89,8 @@ int hcal_det_effi_gun(const char *configfilename, std::string filebase="siout/hc
   double T_yHCAL_exp;  Tout->Branch("yHCAL_exp", &T_yHCAL_exp, "yHCAL_exp/D"); // expected y (from MC truth)
 
   // costruct axes of HCAL CoS in Hall CoS
-  vector<TVector3> HCAL_axes;
-  kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
-  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, "simu");  
+  vector<TVector3> HCAL_axes; kine::SetHCALaxes(sbsconf.GetSBStheta_rad(), HCAL_axes);
+  TVector3 HCAL_origin = sbsconf.GetHCALdist()*HCAL_axes[2];   
 
   // define the histograms
   TH1D *h_eHCAL_array[int(h_pN_lims[0])];

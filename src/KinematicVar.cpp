@@ -57,31 +57,31 @@ namespace kine {
     HCAL_axes.push_back(HCAL_zaxis);
   }
   //--------------------------------------------
-  TVector3 HCALOriginOffset(vector<TVector3> HCAL_axes, std::string dataOrsimu) {
-    /* Calculates HCAL origin offset vector: A vector pointing from HCAL center 
-       defined by DB xpos and ypos to real HCAL origin.
-       input:
-       1. HCAL_axes    : HCAL CoS axes [in Hall CoS]
-       2. dataOrsimu   : Choose "Data" or "Simulation". Required since block positions are slightly 
-                         different in data and simulation DBs.
-    */
-    if (dataOrsimu.compare("data") == 0)
-      return expconst::hcaloffset_v_data*HCAL_axes[0] + expconst::hcaloffset_h_data*HCAL_axes[1];
-    else if (dataOrsimu.compare("simu") == 0)
-      return expconst::hcaloffset_v_simu*HCAL_axes[0] + expconst::hcaloffset_h_simu*HCAL_axes[1];
-    else {
-      std::cerr << "[KinematicVar::HCALOriginOffset] Enter a valid analysis type! **!**" << std::endl;
-      TVector3 err(-1000,-1000,-1000);
-      return err;
-    }
-  }
-  void SetHCALorigin(double sbsdist,                                // SBS distance (m)
-		     vector<TVector3> HCAL_axes,                    // HCAL CoS axes [in Hall CoS]
-		     std::string dataOrsimu,                        // Choose "Data" or "Simulation"
-		     TVector3 &HCAL_origin) {                       // Output: HCAL origin vector from vertex
-    /* Sets HCAL origin vector from vertex in Hall CoS */
-    HCAL_origin = sbsdist*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, dataOrsimu);    
-  }
+  // TVector3 HCALOriginOffset(vector<TVector3> HCAL_axes, std::string dataOrsimu) {
+  //   /* Calculates HCAL origin offset vector: A vector pointing from HCAL center 
+  //      defined by DB xpos and ypos to real HCAL origin.
+  //      input:
+  //      1. HCAL_axes    : HCAL CoS axes [in Hall CoS]
+  //      2. dataOrsimu   : Choose "Data" or "Simulation". Required since block positions are slightly 
+  //                        different in data and simulation DBs.
+  //   */
+  //   if (dataOrsimu.compare("data") == 0)
+  //     return expconst::hcaloffset_v_data*HCAL_axes[0] + expconst::hcaloffset_h_data*HCAL_axes[1];
+  //   else if (dataOrsimu.compare("simu") == 0)
+  //     return expconst::hcaloffset_v_simu*HCAL_axes[0] + expconst::hcaloffset_h_simu*HCAL_axes[1];
+  //   else {
+  //     std::cerr << "[KinematicVar::HCALOriginOffset] Enter a valid analysis type! **!**" << std::endl;
+  //     TVector3 err(-1000,-1000,-1000);
+  //     return err;
+  //   }
+  // }
+  // void SetHCALorigin(double sbsdist,                                // SBS distance (m)
+  // 		     vector<TVector3> HCAL_axes,                    // HCAL CoS axes [in Hall CoS]
+  // 		     std::string dataOrsimu,                        // Choose "Data" or "Simulation"
+  // 		     TVector3 &HCAL_origin) {                       // Output: HCAL origin vector from vertex
+  //   /* Sets HCAL origin vector from vertex in Hall CoS */
+  //   HCAL_origin = sbsdist*HCAL_axes[2] + kine::HCALOriginOffset(HCAL_axes, dataOrsimu);    
+  // }
   //--------------------------------------------
   void GetxyHCALexpect(TVector3 vertex, TVector3 pNhat, TVector3 HCAL_origin, 
 		       vector<TVector3> HCAL_axes, vector<double> &xyHCALexpect) {

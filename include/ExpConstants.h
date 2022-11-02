@@ -31,11 +31,11 @@ namespace expconst {
   static const double xHCAL_b_DB_MC = 1.37562;  //m, center of bottom row blocks (from SBS-replay/DB_MC)
   static const double yHCAL_r_DB_MC = -0.85217; //m, center of right most blocks (from SBS-replay/DB_MC)
   static const double yHCAL_l_DB_MC = 0.85217;  //m, center of left most blocks (from SBS-replay/DB_MC)
-  // 3. Offsets adjusted by looking at deltax and deltay distributions
-  static const double hcaloffset_v_data = -0.38; //m, vert. offset of HCAL origin w.r.t DB (data)
-  static const double hcaloffset_h_data = 0.15;  //m, horiz. offset of HCAL origin w.r.t DB (data)
-  static const double hcaloffset_v_simu = 0.0;   //m, vert. offset of HCAL origin w.r.t DB (simu)
-  static const double hcaloffset_h_simu = 0.0;   //m, horiz. offset of HCAL origin w.r.t DB (simu)
+  /* // 3. Offsets adjusted by looking at deltax and deltay distributions */
+  /* static const double hcaloffset_v_data = -0.38; //m, vert. offset of HCAL origin w.r.t DB (data) */
+  /* static const double hcaloffset_h_data = 0.15;  //m, horiz. offset of HCAL origin w.r.t DB (data) */
+  /* static const double hcaloffset_v_simu = 0.0;   //m, vert. offset of HCAL origin w.r.t DB (simu) */
+  /* static const double hcaloffset_h_simu = 0.0;   //m, horiz. offset of HCAL origin w.r.t DB (simu) */
   
   // Constant for the entire experiment
   // target
