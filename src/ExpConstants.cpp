@@ -108,6 +108,27 @@ namespace expconst {
       return -1;
     }
   }
+  //--------------------------------------------
+  double hcaltheta(int config){
+    if(config==1)
+      return 33.5;
+    else if(config==4)
+      return 31.9;
+    else if(config==7)
+      return 16.1;
+    else if(config==11)
+      return 13.3;
+    else if(config==14)
+      return 17.3;
+    else if(config==8)
+      return 29.4;
+    else if(config==9)
+      return 22.0;
+    else{
+      std::cerr << "Enter a valid SBS configuration!" << std::endl;
+      return -1;
+    }
+  }
 
 } //::expconst
 
