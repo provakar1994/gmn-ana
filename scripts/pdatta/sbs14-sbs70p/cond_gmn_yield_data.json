@@ -25,7 +25,7 @@
 }
 
 "
-## This is a config file for gmn_yield_data.cpp script. 
+## This is a config file for qelas_ana_data.cpp script. 
 # README:
 dx_p(n) : deltax dist. of p(n). dx_p(n)[0] => Peak position, dx_p(n)[1] => Peak RMS
 dy_p(n) : deltay dist. of p(n). dy_p(n)[0] => Peak position, dy_p(n)[1] => Peak RMS

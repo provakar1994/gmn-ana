@@ -19,7 +19,7 @@
 #include "../../include/gmn-ana.h"
 #include "../../dflay/src/JSONManager.cxx"
 
-int gmn_yield_data (const char *configfilename, std::string filebase="pdout/gmn_yield_data")
+int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qelas_ana_data")
 {
   gErrorIgnoreLevel = kError; // Ignores all ROOT warnings
 
