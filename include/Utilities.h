@@ -21,6 +21,8 @@ namespace util_pd {
      ##              Kinematic Histograms           ##  
      ################################################# */
   TH1F *TH1FhW(std::string name);   // returns W histogram
+  TH1F *TH1FhQ2(std::string name,   // returns Q2 histogram
+		int conf);   // SBS config
 }
 
 #endif

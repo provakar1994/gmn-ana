@@ -9,6 +9,10 @@ namespace kine {
       temp = ebeam/(1. + (ebeam/constant::Mp)*(1.0 - cos(etheta)));
     else if (Ntype.compare("n") == 0) 
       temp = ebeam/(1. + (ebeam/constant::Mn)*(1.0 - cos(etheta)));
+    else if (Ntype.compare("np") == 0) {
+      double Nmass = 0.5*(constant::Mn + constant::Mp);
+      temp = ebeam/(1. + (ebeam/Nmass)*(1.0 - cos(etheta)));
+    }
     else
       std::cerr << "[KinematicVar::pcentral] Enter a valid nucleon type! **!**" << std::endl;
     return temp;
@@ -27,6 +31,8 @@ namespace kine {
       PN.SetPxPyPzE(0., 0., 0., constant::Mp);
     else if (Ntype.compare("n") == 0) 
       PN.SetPxPyPzE(0., 0., 0., constant::Mn);
+    else if (Ntype.compare("np") == 0) 
+      PN.SetPxPyPzE(0., 0., 0., 0.5*(constant::Mn+constant::Mp));
     else
       std::cerr << "[KinematicVar::pcentral] Enter a valid nucleon type! **!**" << std::endl;
   } 
@@ -36,6 +42,8 @@ namespace kine {
       return sqrt(pow(nu, 2.) + 2. * constant::Mp * nu);
     else if (Ntype.compare("n") == 0)      
       return sqrt(pow(nu, 2.) + 2. * constant::Mn * nu);
+    else if (Ntype.compare("np") == 0)      
+      return sqrt(pow(nu, 2.) + 2. * 0.5*(constant::Mn+constant::Mp) * nu);
     else {
       std::cerr << "[KinematicVar::pN_expect] Enter a valid nucleon type! **!**" << std::endl;
       return -1;
@@ -117,6 +125,8 @@ namespace kine {
       temp = pow(constant::Mp,2.0) + 2.0*constant::Mp*(ebeam-eeprime) - Q2;
     else if (Ntype.compare("n") == 0) 
       temp = pow(constant::Mn,2.0) + 2.0*constant::Mn*(ebeam-eeprime) - Q2;
+    else if (Ntype.compare("np") == 0) 
+      temp = pow(0.5*(constant::Mn+constant::Mp),2.0) + 2.0*0.5*(constant::Mn+constant::Mp)*(ebeam-eeprime) - Q2;
     else
       std::cerr << "[KinematicVar::W2] Enter a valid nucleon type! **!**" << std::endl;
     return temp;

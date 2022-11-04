@@ -70,6 +70,20 @@ namespace cut {
     return safety_margin;
   }
   //___________________________________________________________________
+  std::vector<double> hcal_safety_margin (double delx_sigma_p, double delx_sigma_n, double dely_sigma, std::vector<double> hcal_active_area) {
+    // returns co-ordinates for the safety margin of HCAL using HCAL active area
+    std::vector<double> safety_margin;
+    double xHCAL_t = hcal_active_area[0] + delx_sigma_p;  // top margin (relevant for proton)
+    double xHCAL_b = hcal_active_area[1] - delx_sigma_n;  // bottom margin (relevant for neutron)
+    double yHCAL_r = hcal_active_area[2] + dely_sigma;    // right margin
+    double yHCAL_l = hcal_active_area[3] - dely_sigma;    // left margin
+    safety_margin.push_back( xHCAL_t ); 
+    safety_margin.push_back( xHCAL_b );
+    safety_margin.push_back( yHCAL_r );
+    safety_margin.push_back( yHCAL_l );
+    return safety_margin;
+  }
+  //___________________________________________________________________
   bool inHCAL_fiducial (double xHCAL_exp, double yHCAL_exp, double delx_shift, vector<double> hcal_safety_margin) {
     // returns "True" if expected nucleon pos. in HCAL is within "Fiducial" region
     bool inFidu = false;
@@ -84,10 +98,11 @@ namespace cut {
     // Now, check whether the protons are in fiducial region or not
     // calculate expected xHCAL_exp for proton [considering SBS magnet kick]
     double xHCAL_exp_p = xHCAL_exp - delx_shift;  // "-" sign due to the fact that protons are upbending
-    bool inFidu_p = yHCAL_exp>yHCAL_r && yHCAL_exp<yHCAL_l && xHCAL_exp_p>xHCAL_t && xHCAL_exp_p<xHCAL_b;
+    bool inFidu_p = xHCAL_exp_p>xHCAL_t && xHCAL_exp_p<xHCAL_b;  //yHCAL_exp cuts the same for n & p
 
     // We return "True" if both isFidu_n and isFidu_p are satisfied
     inFidu = inFidu_n && inFidu_p;
+    //inFidu = yHCAL_exp>yHCAL_r && yHCAL_exp<yHCAL_l && xHCAL_exp<xHCAL_b && xHCAL_exp_p>xHCAL_t;
     return inFidu;
   } 
 

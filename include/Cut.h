@@ -32,6 +32,11 @@ namespace cut {
   std::vector<double> hcal_safety_margin (double delx_sigma,                      // vertical (x) pos of recoil N at HCAL
 					  double dely_sigma,                      // horizontal (y) pos of recoil N at HCAL
 					  std::vector<double> hcal_active_area);  // HCAL active area co-ordinates
+  // Defines safety region within HCAL for expected nucleon positions (Overloading)
+  std::vector<double> hcal_safety_margin (double delx_sigma_p,                    // vertical (x) pos of recoil p at HCAL
+					  double delx_sigma_n,                    // vertical (x) pos of recoil n at HCAL
+					  double dely_sigma,                      // horizontal (y) pos of recoil N at HCAL
+					  std::vector<double> hcal_active_area);  // HCAL active area co-ordinates
 
   // Returns "True" if expected nucleon pos. in HCAL is within "Fiducial" region
   bool inHCAL_fiducial (double xHCAL_exp,                        // m, expected vert. (x) pos of recoil N at HCAL
