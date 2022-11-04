@@ -1,6 +1,6 @@
 /* 
    This macro will be used to get elastic yields for gmn.
-   E.g. Config. File: sbs14-sbs70p/conf_gmn_yield_data.json
+   E.g. Config. File: sbs14-sbs70p/conf_qelas_ana_data.json
    -----
    P. Datta  Created  11-02-2022 
 */
