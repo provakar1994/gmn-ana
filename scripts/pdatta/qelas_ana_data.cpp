@@ -71,6 +71,10 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
   // double HALLA_p;
   // setrootvar::setbranch(C, "HALLA_p", "", &HALLA_p);
 
+  // bbcal clus var
+  double eSH; setrootvar::setbranch(C,"bb.sh","e",&eSH);
+  double ePS; setrootvar::setbranch(C,"bb.ps","e",&ePS);
+  
   // hcal clus var
   double eHCAL, xHCAL, yHCAL, rblkHCAL, cblkHCAL, idblkHCAL;
   std::vector<std::string> hcalclvar = {"e","x","y","rowblk","colblk","idblk"};
@@ -78,11 +82,11 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
   setrootvar::setbranch(C, "sbs.hcal", hcalclvar, hcalclvar_mem);
 
   // track var
-  double ntrack, p[maxNtr],px[maxNtr],py[maxNtr],pz[maxNtr];
+  double ntrack, p[maxNtr],px[maxNtr],py[maxNtr],pz[maxNtr],xTr[maxNtr],yTr[maxNtr],thTr[maxNtr],phTr[maxNtr];
   double vx[maxNtr],vy[maxNtr],vz[maxNtr];
   double xtgt[maxNtr],ytgt[maxNtr],thtgt[maxNtr],phtgt[maxNtr];
-  std::vector<std::string> trvar = {"n","p","px","py","pz","vx","vy","vz","tg_x","tg_y","tg_th","tg_ph"};
-  std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,&vx,&vy,&vz,&xtgt,&ytgt,&thtgt,&phtgt};
+  std::vector<std::string> trvar = {"n","p","px","py","pz","x","y","th","ph","vx","vy","vz","tg_x","tg_y","tg_th","tg_ph"};
+  std::vector<void*> trvar_mem = {&ntrack,&p,&px,&py,&pz,&xTr,&yTr,&thTr,&phTr,&vx,&vy,&vz,&xtgt,&ytgt,&thtgt,&phtgt};
   setrootvar::setbranch(C,"bb.tr",trvar,trvar_mem);
 
   // tdctrig variable (N/A for simulation)
@@ -107,23 +111,56 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
   TH1F *h_W_cut = util_pd::TH1FhW("h_W_cut");
   TH1F *h_W_acut = util_pd::TH1FhW("h_W_acut");
   TH1D *h_dpel = new TH1D("h_dpel",";p/p_{elastic}(#theta)-1;",100,-0.3,0.3);
-  //temp
-  TH1D *h_dpel_p = new TH1D("h_dpel_p",";p/p_{elastic}(#theta)-1;",100,-0.3,0.3);
-  TH1D *h_dpel_n = new TH1D("h_dpel_n",";p/p_{elastic}(#theta)-1;",100,-0.3,0.3);
   
   TH1F *h_Q2 = util_pd::TH1FhQ2("h_Q2", conf);
   vector<double> hdx_lim; jmgr->GetVectorFromKey<double>("h_dxHCAL_lims", hdx_lim);
   vector<double> hdy_lim; jmgr->GetVectorFromKey<double>("h_dyHCAL_lims", hdy_lim);
   TH1F *h_dxHCAL = new TH1F("h_dxHCAL","; x_{HCAL} - x_{exp} (m);",int(hdx_lim[0]),hdx_lim[1],hdx_lim[2]);
-  TH1F *h_dxHCAL_fcut = new TH1F("h_dxHCAL_fcut","; x_{HCAL} - x_{exp} (m);",int(hdx_lim[0]),hdx_lim[1],hdx_lim[2]);
-  TH1F *h_dxHCAL_afcut = new TH1F("h_dxHCAL_afcut","; x_{HCAL} - x_{exp} (m);",int(hdx_lim[0]),hdx_lim[1],hdx_lim[2]);
   TH1F *h_dyHCAL = new TH1F("h_dyHCAL","; y_{HCAL} - y_{exp} (m);",int(hdy_lim[0]),hdy_lim[1],hdy_lim[2]);
-  // TH1F *h_coin_time = new TH1F("h_coin_time", "Coincidence time (ns)", 200, 380, 660);
+  TH1F *h_coin_time = new TH1F("h_coin_time", "Coincidence time (ns)", 200, 380, 660);
 
-  TH2F *h2_dxdyHCAL = util_pd::TH2FdxdyHCAL("h2_dxdyHCAL");
   TH2F *h2_rcHCAL = util_pd::TH2FHCALface_rc("h2_rcHCAL");
+  TH2F *h2_dxdyHCAL = util_pd::TH2FdxdyHCAL("h2_dxdyHCAL");
   TH2F *h2_xyHCAL_p = util_pd::TH2FHCALface_xy_data("h2_xyHCAL_p");
   TH2F *h2_xyHCAL_n = util_pd::TH2FHCALface_xy_data("h2_xyHCAL_n");
+
+  // Defining interesting ROOT tree branches 
+  TTree *Tout = new TTree("Tout", "");
+  //cuts
+  bool WCut;            Tout->Branch("WCut", &WCut, "WCut/B");
+  bool pCut;            Tout->Branch("pCut", &pCut, "pCut/B");
+  bool nCut;            Tout->Branch("nCut", &nCut, "nCut/B");
+  bool fiduCut;         Tout->Branch("fiduCut", &fiduCut, "fiduCut/B");
+  //
+  double T_ebeam;       Tout->Branch("ebeam", &T_ebeam, "ebeam/D");
+  //kine
+  double T_nu;          Tout->Branch("nu", &T_nu, "nu/D");
+  double T_Q2;          Tout->Branch("Q2", &T_Q2, "Q2/D");
+  double T_W2;          Tout->Branch("W2", &T_W2, "W2/D");
+  double T_dpel;        Tout->Branch("dpel", &T_dpel, "dpel/D");
+  double T_ephi;        Tout->Branch("ephi", &T_ephi, "ephi/D");
+  double T_etheta;      Tout->Branch("etheta", &T_etheta, "etheta/D");
+  double T_pcentral;    Tout->Branch("pcentral", &T_pcentral, "pcentral/D");
+  //track
+  double T_vz;          Tout->Branch("vz", &T_vz, "vz/D");
+  double T_trP;         Tout->Branch("trP", &T_trP, "trP/D");
+  double T_trX;         Tout->Branch("trX", &T_trX, "trX/D");
+  double T_trY;         Tout->Branch("trY", &T_trY, "trY/D");
+  double T_trTh;        Tout->Branch("trTh", &T_trTh, "trTh/D");
+  double T_trPh;        Tout->Branch("trPh", &T_trPh, "trPh/D");
+  //BBCAL
+  double T_ePS;         Tout->Branch("ePS", &T_ePS, "ePS/D"); 
+  double T_eSH;         Tout->Branch("eSH", &T_eSH, "eSH/D"); 
+  //HCAL
+  double T_eHCAL;       Tout->Branch("eHCAL", &T_eHCAL, "eHCAL/D"); 
+  double T_xHCAL;       Tout->Branch("xHCAL", &T_xHCAL, "xHCAL/D"); 
+  double T_yHCAL;       Tout->Branch("yHCAL", &T_yHCAL, "yHCAL/D"); 
+  double T_xHCAL_exp;   Tout->Branch("xHCAL_exp", &T_xHCAL_exp, "xHCAL_exp/D"); 
+  double T_yHCAL_exp;   Tout->Branch("yHCAL_exp", &T_yHCAL_exp, "yHCAL_exp/D"); 
+  double T_dx;          Tout->Branch("dx", &T_dx, "dx/D"); 
+  double T_dy;          Tout->Branch("dy", &T_dy, "dy/D");
+  //coin time trigger
+  double T_coinT_trig;  Tout->Branch("coinT_trig", &T_coinT_trig, "coinT_trig/D");
 
   // Do the energy loss calculation here ...........
 
@@ -170,13 +207,13 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
     if (!passedgCut) continue;
 
     // coin time cut (N/A for simulation)  !! Not a reliable cut - loosing a lot of elastics
-    // double bbcal_time=0., hcal_time=0.;
-    // for(int ihit=0; ihit<tdcElemN; ihit++){
-    //   if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
-    //   if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
-    // }
-    // double coin_time = hcal_time - bbcal_time;  h_coin_time->Fill( coin_time );
-    // if(fabs(coin_time - 518) > 10.) continue;
+    double bbcal_time=0., hcal_time=0.;
+    for(int ihit=0; ihit<tdcElemN; ihit++){
+      if(tdcElem[ihit]==5) bbcal_time=tdcTrig[ihit];
+      if(tdcElem[ihit]==0) hcal_time=tdcTrig[ihit];
+    }
+    double coin_time = hcal_time - bbcal_time;  
+    T_coinT_trig = coin_time; h_coin_time->Fill(coin_time);
 
     // kinematic parameters
     double ebeam = sbsconf.GetEbeam();       // Expected beam energy (GeV) [Get it from EPICS, eventually]
@@ -206,33 +243,57 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
     /* Different modes of calculation. Goal is to achieve the best resolution
        model 0 = uses reconstructed p as independent variable
        model 1 = uses reconstructed angles as independent variable 
-       model 2 => uses 4-vector calculation */
+       model 2 = uses 4-vector calculation */
     TVector3 pNhat;                   // 3-momentum of the recoil nucleon (Unit)
     double Q2recon, W2recon;
     if (model == 0) {
-      nu = ebeam_corr - Peprime.E();
+      nu = Pe.E() - Peprime.E();
       pN_expect = kine::pN_expect(nu, Ntype);
-      thetaN_expect = acos((ebeam_corr - Peprime.Pz()) / pN_expect);
+      thetaN_expect = acos((Pe.E() - Peprime.Pz()) / pN_expect);
       pNhat = kine::qVect_unit(thetaN_expect, phiN_expect);
-      Q2recon = kine::Q2(ebeam_corr, Peprime.E(), etheta);
-      W2recon = kine::W2(ebeam_corr, Peprime.E(), Q2recon, Ntype);
+      Q2recon = kine::Q2(Pe.E(), Peprime.E(), etheta);
+      W2recon = kine::W2(Pe.E(), Peprime.E(), Q2recon, Ntype);
     } else if (model == 1) {
-      nu = ebeam_corr - pcentral;
+      nu = Pe.E() - pcentral;
       pN_expect = kine::pN_expect(nu, Ntype);
-      thetaN_expect = acos((ebeam_corr - pcentral*cos(etheta)) / pN_expect);
+      thetaN_expect = acos((Pe.E() - pcentral*cos(etheta)) / pN_expect);
       pNhat = kine::qVect_unit(thetaN_expect, phiN_expect);
-      Q2recon = kine::Q2(ebeam_corr, Peprime.E(), etheta);
-      W2recon = kine::W2(ebeam_corr, Peprime.E(), Q2recon, Ntype);
+      Q2recon = kine::Q2(Pe.E(), Peprime.E(), etheta);
+      W2recon = kine::W2(Pe.E(), Peprime.E(), Q2recon, Ntype);
     } else if (model == 2) {
       TLorentzVector q = Pe - Peprime; // 4-momentum of virtual photon
+      nu = q.E();
       pNhat = q.Vect().Unit();
       Q2recon = -q.M2();
       W2recon = (PN + q).M2();
     }
-
     h_Q2->Fill(Q2recon); 
     double Wrecon = sqrt(max(0., W2recon));
     double dpel = Peprime.E()/pcentral - 1.0; h_dpel->Fill(dpel);
+
+    T_ebeam = Pe.E();
+
+    T_nu = nu;
+    T_Q2 = Q2recon;
+    T_W2 = W2recon;
+    T_dpel = dpel;
+    T_ephi = ephi;
+    T_etheta = etheta;
+    T_pcentral = pcentral;
+
+    T_vz = vz[0];
+    T_trP = p[0];
+    T_trX = xTr[0];
+    T_trY = yTr[0];
+    T_trTh = thTr[0];
+    T_trPh = phTr[0];
+
+    T_ePS = ePS;
+    T_eSH = eSH;
+
+    T_eHCAL = eHCAL;
+    T_xHCAL = xHCAL;
+    T_yHCAL = yHCAL;
 
     // Expected position of the q vector at HCAL
     vector<double> xyHCAL_exp; // xyHCAL_exp[0] = xHCAL_exp & xyHCAL_exp[1] = yHCAL_exp
@@ -240,42 +301,48 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
     double dx = xHCAL - xyHCAL_exp[0];  
     double dy = yHCAL - xyHCAL_exp[1]; 
 
-    if (Wrecon > Wmin && Wrecon < Wmax && abs(dy) < 0.3) h_dxHCAL->Fill(dx);
+    T_xHCAL_exp = xyHCAL_exp[0];
+    T_yHCAL_exp = xyHCAL_exp[1];
+    T_dx = dx;
+    T_dy = dy;
 
     // HCAL active area and safety margin cuts [Fiducial region]
     bool AR_cut = cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area);
     bool FR_cut = cut::inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], sbs_kick, hcal_safety_margin);
-    // if (!cut::inHCAL_activeA(xHCAL, yHCAL, hcal_active_area)) continue;
-    // if (!cut::inHCAL_fiducial(xyHCAL_exp[0], xyHCAL_exp[1], sbs_kick, hcal_safety_magin)) continue: 
+
+    // HCAL cuts
+    pCut = pow((dx-dx_p[0]) / (dx_p[1]*Nsigma_cut_dx_p), 2) + pow((dy-dy_p[0]) / (dy_p[1]*Nsigma_cut_dy_p), 2) <= 1.;
+    nCut = pow((dx-dx_n[0]) / (dx_n[1]*Nsigma_cut_dx_n), 2) + pow((dy-dy_n[0]) / (dy_n[1]*Nsigma_cut_dy_n), 2) <= 1.;
+
+    fiduCut = AR_cut && FR_cut;
+    WCut = Wrecon > Wmin && Wrecon < Wmax;
 
     // W cut
-    //if (Wrecon < Wmin || Wrecon > Wmax) continue;
-    //if (abs(Wrecon - 0.876) > 0.2) continue;
-    h_W->Fill(Wrecon);
-    if (Wrecon > Wmin && Wrecon < Wmax) {
-
-      // histos with fiducial cut
-      if (AR_cut && FR_cut) {
-	if (abs(dy) < 0.3) h_dxHCAL_fcut->Fill(dx);
+    if (WCut) {
+      // fiducial cut
+      if (fiduCut) {
+	h_dxHCAL->Fill(dx);
 	h_dyHCAL->Fill(dy);
 	h2_rcHCAL->Fill(cblkHCAL, rblkHCAL);
 	h2_dxdyHCAL->Fill(dy, dx);
-      } else {
-	if (abs(dy) < 0.3) h_dxHCAL_afcut->Fill(dx);
+
+	if (pCut) h2_xyHCAL_p->Fill(xyHCAL_exp[1], xyHCAL_exp[0] - sbs_kick);
+	if (nCut) h2_xyHCAL_n->Fill(xyHCAL_exp[1], xyHCAL_exp[0]);
       }
     }
 
-    // HCAL cut
-    bool pcut = pow((dx-dx_p[0]) / (dx_p[1]*Nsigma_cut_dx_p), 2) + pow((dy-dy_p[0]) / (dy_p[1]*Nsigma_cut_dy_p), 2) <= 1.;
-    bool ncut = pow((dx-dx_n[0]) / (dx_n[1]*Nsigma_cut_dx_n), 2) + pow((dy-dy_n[0]) / (dy_n[1]*Nsigma_cut_dy_n), 2) <= 1.;
-    if (pcut) h2_xyHCAL_p->Fill(xyHCAL_exp[1], xyHCAL_exp[0] - sbs_kick);
-    if (ncut) h2_xyHCAL_n->Fill(xyHCAL_exp[1], xyHCAL_exp[0]);
-    if (pcut || ncut) { 
-      h_W_cut->Fill(Wrecon);
-    } else {
-      h_W_acut->Fill(Wrecon);
+    // fiducial cut but no W cut
+    if (fiduCut) {
+      h_W->Fill(Wrecon);
+      if (pCut || nCut) { 
+	h_W_cut->Fill(Wrecon);
+      } else {
+	h_W_acut->Fill(Wrecon);
+      }
     }
       
+
+    Tout->Fill();
   } // event loop
   std::cout << std::endl << std::endl;
 
@@ -357,6 +424,7 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
   sw->Stop();
   cout << "CPU time elapsed = " << sw->CpuTime() << " s. Real time = " << sw->RealTime() << " s. " << endl << endl;
 
+  c1->Write();
   fout->Write();
   sw->Delete();
   delete jmgr;
