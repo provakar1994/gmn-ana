@@ -19,7 +19,7 @@
 #include "../../include/gmn-ana.h"
 #include "../../dflay/src/JSONManager.cxx"
 
-int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qelas_ana_data")
+int qelas_ana_data (const char *configfilename, std::string filebase="pdout/test_qelas_ana_data")
 {
   gErrorIgnoreLevel = kError; // Ignores all ROOT warnings
 
@@ -357,69 +357,27 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/qela
   Ep_n.SetFillStyle(0); Ep_n.SetLineColor(3); Ep_n.SetLineWidth(2);
   Ep_n.DrawEllipse(dy_n[0], dx_n[0], Nsigma_cut_dy_n*dy_n[1], Nsigma_cut_dx_n*dx_n[1], 0,360,0);
  
-  c1->cd(2); // h2_rcHCAL->Draw("colz");
+  c1->cd(2);
   h_W->Draw(); h_W->SetLineColor(1);
   h_W_cut->Draw("same"); h_W_cut->SetLineColor(2);
   h_W_acut->Draw("same");
 
-  c1->cd(3); //h_dxHCAL->Draw();
+  c1->cd(3);
   h2_xyHCAL_p->Draw("colz");
-  TLine L1h_AR;
-  L1h_AR.SetLineColor(2); L1h_AR.SetLineWidth(4); L1h_AR.SetLineStyle(9);
-  L1h_AR.DrawLine(hcal_active_area[2],hcal_active_area[1],hcal_active_area[3],hcal_active_area[1]);
-  TLine L2h_AR;
-  L2h_AR.SetLineColor(2); L2h_AR.SetLineWidth(4); L2h_AR.SetLineStyle(9);
-  L2h_AR.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[3],hcal_active_area[0]);
-  TLine L1v_AR;
-  L1v_AR.SetLineColor(2); L1v_AR.SetLineWidth(4); L1v_AR.SetLineStyle(9);
-  L1v_AR.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[2],hcal_active_area[1]);
-  TLine L2v_AR;
-  L2v_AR.SetLineColor(2); L2v_AR.SetLineWidth(4); L2v_AR.SetLineStyle(9);
-  L2v_AR.DrawLine(hcal_active_area[3],hcal_active_area[0],hcal_active_area[3],hcal_active_area[1]);
-  // safety margin
-  TLine L1h_SM;
-  L1h_SM.SetLineColor(4); L1h_SM.SetLineWidth(4); L1h_SM.SetLineStyle(9);
-  L1h_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[1],hcal_safety_margin[3],hcal_safety_margin[1]);
-  TLine L2h_SM;
-  L2h_SM.SetLineColor(4); L2h_SM.SetLineWidth(4); L2h_SM.SetLineStyle(9);
-  L2h_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[0],hcal_safety_margin[3],hcal_safety_margin[0]);
-  TLine L1v_SM;
-  L1v_SM.SetLineColor(4); L1v_SM.SetLineWidth(4); L1v_SM.SetLineStyle(9);
-  L1v_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[0],hcal_safety_margin[2],hcal_safety_margin[1]);
-  TLine L2v_SM;
-  L2v_SM.SetLineColor(4); L2v_SM.SetLineWidth(4); L2v_SM.SetLineStyle(9);
-  L2v_SM.DrawLine(hcal_safety_margin[3],hcal_safety_margin[0],hcal_safety_margin[3],hcal_safety_margin[1]);
+  util_pd::DrawArea(hcal_active_area);
+  util_pd::DrawArea(hcal_safety_margin,4);
 
   c1->cd(4); 
   h2_xyHCAL_n->Draw("colz");
-  //TLine L1h_AR;
-  L1h_AR.SetLineColor(2); L1h_AR.SetLineWidth(4); L1h_AR.SetLineStyle(9);
-  L1h_AR.DrawLine(hcal_active_area[2],hcal_active_area[1],hcal_active_area[3],hcal_active_area[1]);
-  //TLine L2h_AR;
-  L2h_AR.SetLineColor(2); L2h_AR.SetLineWidth(4); L2h_AR.SetLineStyle(9);
-  L2h_AR.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[3],hcal_active_area[0]);
-  //TLine L1v_AR;
-  L1v_AR.SetLineColor(2); L1v_AR.SetLineWidth(4); L1v_AR.SetLineStyle(9);
-  L1v_AR.DrawLine(hcal_active_area[2],hcal_active_area[0],hcal_active_area[2],hcal_active_area[1]);
-  //TLine L2v_AR;
-  L2v_AR.SetLineColor(2); L2v_AR.SetLineWidth(4); L2v_AR.SetLineStyle(9);
-  L2v_AR.DrawLine(hcal_active_area[3],hcal_active_area[0],hcal_active_area[3],hcal_active_area[1]);
-  // safety margin
-  //TLine L1h_SM;
-  L1h_SM.SetLineColor(4); L1h_SM.SetLineWidth(4); L1h_SM.SetLineStyle(9);
-  L1h_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[1],hcal_safety_margin[3],hcal_safety_margin[1]);
-  //TLine L2h_SM;
-  L2h_SM.SetLineColor(4); L2h_SM.SetLineWidth(4); L2h_SM.SetLineStyle(9);
-  L2h_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[0],hcal_safety_margin[3],hcal_safety_margin[0]);
-  //TLine L1v_SM;
-  L1v_SM.SetLineColor(4); L1v_SM.SetLineWidth(4); L1v_SM.SetLineStyle(9);
-  L1v_SM.DrawLine(hcal_safety_margin[2],hcal_safety_margin[0],hcal_safety_margin[2],hcal_safety_margin[1]);
-  //TLine L2v_SM;
-  L2v_SM.SetLineColor(4); L2v_SM.SetLineWidth(4); L2v_SM.SetLineStyle(9);
-  L2v_SM.DrawLine(hcal_safety_margin[3],hcal_safety_margin[0],hcal_safety_margin[3],hcal_safety_margin[1]);
+  util_pd::DrawArea(hcal_active_area);
+  util_pd::DrawArea(hcal_safety_margin,4);
 
-  outFile.ReplaceAll(".root",".png");
-  c1->Print(outFile.Data(),"png");
+  // outFile.ReplaceAll(".root",".png");
+  // c1->Print(outFile.Data(),"png");
+
+  cout << "------" << endl;
+  cout << " Output file : " << outFile << endl;
+  cout << "------" << endl << endl;
 
   sw->Stop();
   cout << "CPU time elapsed = " << sw->CpuTime() << " s. Real time = " << sw->RealTime() << " s. " << endl << endl;

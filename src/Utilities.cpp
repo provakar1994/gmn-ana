@@ -40,12 +40,30 @@ namespace util_pd {
 		       expconst::hcalrow, x_min, x_max);
     return h;
   }
+  //_____________________________________
   TH2F *TH2FdxdyHCAL(std::string name) {
     // returns TH2F for dxdyHCAL
     TH2F *h = new TH2F(name.c_str(), "; y_{HCAL} - y_{exp} (m); x_{HCAL} - x_{exp} (m)",
 		       250, -1.25, 1.25, 250, -3.5, 2);
     return h;
   }
+  //_____________________________________
+  void DrawArea(vector<double> dimensions, int lcolor=2, int lwidth=4, int lstyle=9) {
+    /* Draws four lines to represent a rectangular cut area */
+    double top = dimensions[0];                 // -X axis
+    double bottom = dimensions[1];              // +X axis
+    double right = dimensions[2];               // -Y axis
+    double left = dimensions[3];                // +Y axis
+    TLine line;
+    line.SetLineColor(lcolor); 
+    line.SetLineWidth(lwidth); 
+    line.SetLineStyle(lstyle);
+    line.DrawLine(right, bottom, left, bottom); // bottom margin
+    line.DrawLine(right, top, left, top);       // top margin
+    line.DrawLine(right, top, right, bottom);   // right margin
+    line.DrawLine(left, top, left, bottom);     // left margin
+  }
+
 
   /* #################################################
      ##              Kinematic Histograms           ##  
