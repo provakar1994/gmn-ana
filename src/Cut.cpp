@@ -2,7 +2,7 @@
 
 namespace cut {
 
-  std::vector<double> hcal_active_area_simu (int nBlk_x=1., int nBlk_y=1.) {
+  std::vector<double> hcal_active_area_simu (int nBlk_x=1, int nBlk_y=1) {
     // defines the active area of HCAL using simulation DB
     // indiv. block pos. can be found at SBS-replay/DB_MC/db_sbs.hcal.dat
     std::vector<double> active_area;
@@ -23,7 +23,7 @@ namespace cut {
     return active_area;
   }
   //___________________________________________________________________
-  std::vector<double> hcal_active_area_data (int nBlk_x=1., int nBlk_y=1.) {
+  std::vector<double> hcal_active_area_data (int nBlk_x=1, int nBlk_y=1) {
     // defines the active area of HCAL using real data DB
     // indiv. block pos. can be found at SBS-replay/DB/db_sbs.hcal.dat
     std::vector<double> active_area;

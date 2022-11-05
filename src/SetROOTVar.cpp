@@ -24,12 +24,12 @@ namespace setrootvar {
 		 std::vector<void*> memory)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
+      std::cerr<< "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
-    for(int i=0;i<suffix.size();i++){
+    for(int i=0;i<int(suffix.size());i++){
       branchname = prefix + std::string(".") + suffix[i];
       T->SetBranchStatus(branchname.c_str(),1);
       T->SetBranchAddress(branchname.c_str(),memory[i]);
@@ -43,12 +43,12 @@ namespace setrootvar {
   		 int ndatavarpos)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
+      std::cerr<< "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
-    for(int i=0;i<suffix.size();i++){
+    for(int i=0;i<int(suffix.size());i++){
       if(i!=ndatavarpos){
   	branchname = prefix + std::string(".") + suffix[i];
   	T->SetBranchStatus(branchname.c_str(),1);
@@ -68,12 +68,12 @@ namespace setrootvar {
   		 std::vector<int> ndatapos)
   {
     if(suffix.size()!=memory.size()){
-      std::cerr << "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
+      std::cerr<< "!*! Contaier size of branch suffix != Container size of branch memory!" << std::endl;
       throw;
     }
     T->SetMakeClass(1); // Allows access to individual sub-branchs
     std::string branchname;
-    for(int i=0;i<suffix.size();i++){
+    for(int i=0;i<int(suffix.size());i++){
       if(std::find(ndatapos.begin(),ndatapos.end(),i)!=ndatapos.end()){
   	branchname = std::string("Ndata.")+prefix+std::string(".")+suffix[i];
   	T->SetBranchStatus(branchname.c_str(),1);

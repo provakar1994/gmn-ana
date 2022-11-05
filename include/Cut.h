@@ -1,6 +1,8 @@
 #ifndef CUT_H
 #define CUT_H
 
+#include <iostream>
+#include "TString.h"
 #include "ExpConstants.h"
 
 namespace cut {
@@ -14,14 +16,14 @@ namespace cut {
   // Defines active area of HCAL excluding desired no. of blocks from all 4 sides
   // Uses ** Simulation ** DB to calculate the active region
   // Default: Excludes 1 block from all 4 sides of HCAL
-  std::vector<double> hcal_active_area_simu (int nBlk_x = 1,   // No. of blocks to exclude form top and bottom 
-					     int nBlk_y = 1);  // No. of blocks to exclude form left and right
+  std::vector<double> hcal_active_area_simu (int nBlk_x ,  // No. of blocks to exclude form top and bottom (Default=1) 
+					     int nBlk_y);  // No. of blocks to exclude form left and right (Default=1)
 
   // Defines active area of HCAL excluding desired no. of blocks from all 4 sides
   // Uses ** Real Data ** DB to calculate the active region
   // Default: Excludes 1 block from all 4 sides of HCAL
-  std::vector<double> hcal_active_area_data (int nBlk_x = 1,   // No. of blocks to exclude form top and bottom
-					     int nBlk_y = 1);  // No. of blocks to exclude form left and right
+  std::vector<double> hcal_active_area_data (int nBlk_x,   // No. of blocks to exclude form top and bottom (Default=1)
+					     int nBlk_y);  // No. of blocks to exclude form left and right (Default=1)
 
   // Returns "True" if nucleon pos. in HCAL is within active area
   bool isHCAL_activeA (double xHCAL,                           // vertical (x) pos of recoil N at HCAL

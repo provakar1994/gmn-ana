@@ -1,6 +1,7 @@
 #ifndef SET_ROOT_VAR_H
 #define SET_ROOT_VAR_H
 
+#include <iostream>
 #include "TTree.h"
 
 namespace setrootvar {

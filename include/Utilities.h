@@ -3,6 +3,7 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TLine.h"
 #include "TLatex.h"
 
 #include "../include/ExpConstants.h"
@@ -19,7 +20,9 @@ namespace util_pd {
 
   // draws rectangular cut regions
   void DrawArea(vector<double> dimensions,      // a vector with extreme points
-		int lcolor=2, int lwidth=4, int lstyle=9);
+		int lcolor,  // Default = 2 
+		int lwidth,  // Default = 4
+		int lstyle); // Default = 9
 
 
   /* #################################################
