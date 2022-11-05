@@ -15,7 +15,12 @@ namespace util_pd {
   TH2F *TH2FHCALface_rc(std::string name);      // returns TH2F for HCAL face (row,col)
   TH2F *TH2FHCALface_xy_data(std::string name); // returns TH2F for HCAL face (x,y) [Data]
   TH2F *TH2FHCALface_xy_simu(std::string name); // returns TH2F for HCAL face (x,y) [Simu]
-  TH2F *TH2FdxdyHCAL(std::string name);   // returns TH2F for dxdyHCAL
+  TH2F *TH2FdxdyHCAL(std::string name);         // returns TH2F for dxdyHCAL
+
+  // draws rectangular cut regions
+  void DrawArea(vector<double> dimensions,      // a vector with extreme points
+		int lcolor=2, int lwidth=4, int lstyle=9);
+
 
   /* #################################################
      ##              Kinematic Histograms           ##  
