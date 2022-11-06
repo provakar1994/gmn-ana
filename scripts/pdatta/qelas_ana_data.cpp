@@ -1,5 +1,5 @@
 /* 
-   This macro will be used to get elastic yields for gmn.
+   This macro will perform QE analysis for GMn using LD2 data.
    E.g. Config. File: sbs14-sbs70p/conf_qelas_ana_data.json
    -----
    P. Datta  Created  11-02-2022 
@@ -97,7 +97,6 @@ int qelas_ana_data (const char *configfilename, std::string filebase="pdout/test
   setrootvar::setbranch(C,"bb.tdctrig",tdcvar,tdcvar_mem,1);
 
   // turning on the remaining branches we use for the globalcut
-  C->SetBranchStatus("bb.ps.e", 1);
   C->SetBranchStatus("bb.gem.track.nhits", 1);
   C->SetBranchStatus("bb.etot_over_p", 1);
 
