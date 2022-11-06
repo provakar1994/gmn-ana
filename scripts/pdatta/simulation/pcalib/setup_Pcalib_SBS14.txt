@@ -1,0 +1,44 @@
+#/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/digi_sbs4_lh2/rep*
+/lustre19/expphy/volatile/halla/sbs/pdbforce/g4sbs_output/gmng4_sbs14/replayed_sbs14_sbs70p_elas_88T_job_1.root
+endlist
+bb.tr.n==1&&bb.ps.e>0.2&&abs(bb.tr.vz)<.08&&sbs.hcal.e>0.025&&abs(bb.etot_over_p-0.92)<0.2&&bb.ps.e+bb.sh.e>1.7
+endcut
+order 1
+useAlShield 1
+dEdx 0.00574
+dEdx_Al 0.0021
+ebeam 5.965
+bbtheta 46.5 
+sbstheta 17.3
+hcaldist 14.0
+Ltgt 15.0
+rho_tgt 0.072
+celldiameter 4.064
+usehcalcut 0
+dx0 -1.15
+dy0 0.002
+dxsigma 0.05
+dysigma 0.04
+GEMpitch 10.0
+#fix_pth0 1
+#fix_pthx 1
+fix_pth0 0
+fix_pthx 0
+#pth0 0.274932
+#pthx 0.101809
+bbdist 1.85
+A_pth0 0.27676
+B_pth0 1.1976
+C_pth0 0.4764
+Wmin 0.6
+Wmax 1.2
+dpel_min -0.05
+dpel_max 0.05
+useAlShield 1
+oldcoeffs simu_sbs4.dat
+fit_thtgt_min -0.15
+fit_thtgt_max 0.12
+hcalcoordsys 0
+endconfig
+
+#&&bb.gem.track.nhits>3
